@@ -1,0 +1,32 @@
+using Plots
+
+inx = []; iny = [];
+outx = []; outy = [];
+total = 1e5
+hit = 0
+r = 50 # sampling rate for image
+
+function circle(x0, y0, r)
+    θ = LinRange(0, 2*pi, 500)
+    return r*cos.(θ) .+ x0, r*sin.(θ) .+ y0
+end
+
+for p in 1:total
+    x, y = rand(), rand()
+    if (x - .5)^2 + (y - .5)^2 < .25  # inside circle
+        if p % r == 0
+            push!(inx, x)
+            push!(iny, y)
+        end
+        global hit += 1
+    elseif p % r == 0
+        push!(outx, x)
+        push!(outy, y)
+    end
+end
+
+plot(circle(.5,.5,.5),label="circle",markerstrokewidth=2,color="black",linestyle=:dash)
+scatter!(inx, iny, color="green",label="inside",legend=:outertopright,markersize=2)
+scatter!(outx, outy, color="red",label="outside",aspect_ratio=.8,markersize=2,showaxis=false)
+title!("Sampling distribution \n(N = 2000)")
+est_PI = 4 * hit / total

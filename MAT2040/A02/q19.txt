@@ -1,0 +1,25 @@
+using LinearAlgebra
+
+A = rand(10, 10)
+
+# (a)
+L, U, p = lu(A)
+U
+diag(U)
+
+#(b)
+#(ii)
+Ã = A[p,:] # Ã = PA
+norm(Ã - L * U)
+
+#(c)
+function ldu(A)
+    L, U, p = lu(A)
+    D = diagm(0 => diag(U))
+    U = inv(D) * U
+    return L,D,U,p
+end
+
+#(d)
+L, D, U, p = ldu(A)
+norm(L * D * U - Ã)

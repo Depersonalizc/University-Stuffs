@@ -1,0 +1,12 @@
+using LinearAlgebra
+
+m = 5; n = 8; p = 4;
+A = rand(m, n);
+
+# (1)
+B = rand(n, p);
+rank(A * B) <= min(rank(A), rank(B))
+
+# (2)
+B = rand(m, n);
+rank(A + B) <= rank(A) + rank(B)

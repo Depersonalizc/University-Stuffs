@@ -1,0 +1,30 @@
+﻿using LinearAlgebra
+
+r(x) = rand(10, 10)
+A, B, C = r.(1:3)
+
+# Associativity
+norm(A * (B * C) - (A * B) * C)
+
+# Distributivity
+norm(A * (B + C) - (A * B + A * C))
+norm((A + B) * C - (A * C + B * C))
+
+# Noncommutativity
+norm(A * B - B * A)
+
+# Block Mult.
+A1 = A[1:5,1:5]
+A2 = A[1:5,6:10]
+A3 = A[6:10,1:5]
+A4 = A[6:10,6:10]
+B1 = B[1:5,1:5]
+B2 = B[1:5,6:10]
+B3 = B[6:10,1:5]
+B4 = B[6:10,6:10]
+Ã = [A1 A2; A3 A4]
+B̃ = [B1 B2; B3 B4]
+norm(A * B - Ã * B̃)
+
+# Property of Inverse
+norm((A * B)^(-1) - B^(-1) * A^(-1))

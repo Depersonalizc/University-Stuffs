@@ -1,0 +1,22 @@
+include("./q20sample.jl")
+include("./q20data.jl")
+using Plots
+
+strs = [string(c) for c in alphabet]
+char_p = [p for p in ng1]'
+next_p = [p for p in ng2]'
+
+# (a)
+plot(char_p, legend = false, xlabel = "letters", ylabel = "probability")
+scatter!(char_p, xticks = (1:27, alphabet[1:27]), title = "character PMF")
+
+# (b)
+heatmap(strs, strs, next_p)
+xlabel!("Current letter")
+ylabel!("Next letter")
+title!("Conditional probability of next letter given the current")
+
+# (c)
+randomSentence(ng, alphabet, 100, 0)
+randomSentence(ng, alphabet, 100, 1)
+randomSentence(ng, alphabet, 100, 2)

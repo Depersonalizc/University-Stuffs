@@ -1,0 +1,14 @@
+using LinearAlgebra
+
+a1 = [0;0;1]
+a2 = 1 / sqrt(2) * [1;1;0]
+a3 = 1 / sqrt(2) * [1;-1;0]
+
+# pairwise inner products are zero
+a1'a2
+a1'a3
+a2'a3
+
+# expansion of x in basis {a1, a2, a3}
+x = [1;2;3]
+norm((a1'x)a1 + (a2'x)a2 + (a3'x)a3 - x)

@@ -1,0 +1,11 @@
+using LinearAlgebra
+
+A = rand(20, 20)
+b = rand(20)
+
+# (a)
+x1 = A \ b
+res_norm_1 = norm(A * x1 - b)
+# (b)
+x2 = inv(A) * b
+res_norm_2 = norm(A * x2 - b)
