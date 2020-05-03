@@ -1,0 +1,9 @@
+\contentsline {section}{\numberline {1}Rectangular Bar Pendulum: Minimum Period}{2}
+\contentsline {subsection}{\numberline {1.1}$x-T$ Plot}{2}
+\contentsline {subsection}{\numberline {1.2}Minimum Period}{2}
+\contentsline {section}{\numberline {2}Rotational Inertia of a Disk}{3}
+\contentsline {subsection}{\numberline {2.1}Raw Data}{3}
+\contentsline {subsection}{\numberline {2.2}Rotational Inertia about CM}{3}
+\contentsline {section}{\numberline {3}Rotational Inertia of an Irregular Pendulum}{3}
+\contentsline {subsection}{\numberline {3.1}Raw Data}{3}
+\contentsline {subsection}{\numberline {3.2}$t-\omega $ Plot and $I_{\text {CM}}$ of the Irregular Pendulum}{4}

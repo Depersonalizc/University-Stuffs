@@ -1,0 +1,22 @@
+\contentsline {section}{\numberline {1}Introduction}{2}
+\contentsline {section}{\numberline {2}Theory}{2}
+\contentsline {subsection}{\numberline {2.1}Damped Harmonic Oscillator without Driving Torque}{2}
+\contentsline {subsection}{\numberline {2.2}Damped Harmonic Oscillator Driven by Sinusoidal Torque}{2}
+\contentsline {subsubsection}{\numberline {2.2.1}Description of Motion}{2}
+\contentsline {subsubsection}{\numberline {2.2.2}Resonance}{3}
+\contentsline {subsubsection}{\numberline {2.2.3}Asymptotic Behavior of Phase Difference $\phi $}{4}
+\contentsline {section}{\numberline {3}Setup}{4}
+\contentsline {subsection}{\numberline {3.1}Equipment}{4}
+\contentsline {subsection}{\numberline {3.2}Sign Check of Sensors}{4}
+\contentsline {section}{\numberline {4}Procedure}{5}
+\contentsline {subsection}{\numberline {4.1}Parameters Collection}{5}
+\contentsline {subsection}{\numberline {4.2}Undamped Frequency}{6}
+\contentsline {subsection}{\numberline {4.3}Torsion Coefficient}{6}
+\contentsline {subsection}{\numberline {4.4}Rotational Inertia}{7}
+\contentsline {subsection}{\numberline {4.5}Resonance Curves}{7}
+\contentsline {subsection}{\numberline {4.6}Damping Coefficient}{7}
+\contentsline {section}{\numberline {5}Analysis}{8}
+\contentsline {subsection}{\numberline {5.1}Theoretical vs. Experimental Undamped Frequencies}{8}
+\contentsline {subsection}{\numberline {5.2}Analysis of Resonance Curves}{9}
+\contentsline {subsection}{\numberline {5.3}Fitting Theory to Resonance Curve}{10}
+\contentsline {subsection}{\numberline {5.4}Phase Analysis}{10}

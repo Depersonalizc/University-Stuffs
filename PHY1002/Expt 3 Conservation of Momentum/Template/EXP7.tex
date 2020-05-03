@@ -1,0 +1,118 @@
+
+\include{command}
+\rmfamily
+
+\section{Total Momentum and Kinetic Energy in Different Collisions}
+The following table records the total momentum and total kinetic energy of the system before and after four types of collisions.
+\begin{table}[!htb]
+	\begin{tabular}{lSSS|SSS}
+		\toprule
+		\multirow{2}{*}{Type} &
+		\multicolumn{2}{c}{Total Momentum ($10^{-2}$ N s)} &
+		\multicolumn{1}{c}{} &
+		\multicolumn{2}{c}{Total Kinetic Energy (mJ)} &
+		\multicolumn{1}{c}{} \\
+		& {$P_0$} & {$P_f$} & {\% Diff} & {KE$_0$} & {KE$_f$} & {\% Diff} \\
+		\midrule
+		I.S. & 8.18 & 8.07 & -1.34 & 12.61 & 6.05 & -52.02 \\
+		I.U. & 7.10& 7.32& +3.01 & 9.59& 2.56 & -73.31 \\
+		E.S. & 9.75 & 9.36 & -4.00 & 17.10 & 16.80 & -1.75 \\
+		E.U. & 11.60 & 10.94 & -5.69 & 25.44 & 23.03 & -9.45  \\
+		\midrule
+		\multicolumn{7}{c}{ I: Completely Inelastic \  E: Elastic \  S: Equal Mass \  U: Unequal Mass}\\
+		\bottomrule
+	\end{tabular}
+\caption{Total Momentum and Kinetic Energy in Four Types of Collisions}
+
+\end{table} 
+
+ 
+\section{Plots}
+This section contains graphs depicting the system in four types of collisions.
+
+
+
+\subsection{Completely Inelastic Collision of Equal Mass}
+\begin{figure}[!htb]
+	\centering
+	\begin{minipage}{.5\textwidth}
+		\centering
+		\includegraphics[width=\linewidth]{iep}
+		\captionof{figure}{Total Momentum vs. Time}
+		\label{fig:test1}
+	\end{minipage}%
+	\begin{minipage}{.5\textwidth}
+		\centering
+		\includegraphics[width=\linewidth]{iek}
+		\captionof{figure}{Total Kinetic Energy vs. Time}
+		\label{fig:test2}
+	\end{minipage}
+\end{figure}
+
+\subsection{Completely Inelastic Collision of Unequal Mass}
+\begin{figure}[!htb]
+	\centering
+	\begin{minipage}{.5\textwidth}
+		\centering
+		\includegraphics[width=\linewidth]{iup}
+		\captionof{figure}{Total Momentum vs. Time}
+		\label{fig:test1}
+	\end{minipage}%
+	\begin{minipage}{.5\textwidth}
+		\centering
+		\includegraphics[width=\linewidth]{iuk}
+		\captionof{figure}{Total Kinetic Energy vs. Time}
+		\label{fig:test2}
+	\end{minipage}
+\end{figure}
+
+
+\subsection{Elastic Collision of Equal Mass}
+\begin{figure}[!htb]
+	\centering
+	\begin{minipage}{.5\textwidth}
+		\centering
+		\includegraphics[width=\linewidth]{eep}
+		\captionof{figure}{Total Momentum vs. Time}
+		\label{fig:test1}
+	\end{minipage}%
+	\begin{minipage}{.5\textwidth}
+		\centering
+		\includegraphics[width=\linewidth]{eek}
+		\captionof{figure}{Total Kinetic Energy vs. Time}
+		\label{fig:test2}
+	\end{minipage}
+\end{figure}
+
+\newpage
+\subsection{Elastic Collision of Unequal Mass}
+\begin{figure}[!htb]
+	\centering
+	\begin{minipage}{.5\textwidth}
+		\centering
+		\includegraphics[width=\linewidth]{eup}
+		\captionof{figure}{Total Momentum vs. Time}
+		\label{fig:test1}
+	\end{minipage}%
+	\begin{minipage}{.5\textwidth}
+		\centering
+		\includegraphics[width=\linewidth]{euk}
+		\captionof{figure}{Total Kinetic Energy vs. Time}
+		\label{fig:test2}
+	\end{minipage}
+\end{figure}
+
+\section{Findings}
+\subsection{Loss of Momentum and Kinetic Energy}
+A loss of momentum and kinetic energy of the system outside periods of collisions is present in all cases. Since the loss of momentum appears to be linear in time, it is strongly suspected that the friction between the carts and the track, as well as the friction between the threads and the pulleys, has caused the loss of both momentum and kinetic energy.
+\subsection{Momentum Conserved in All Collisions}
+The percentage difference in momentum before and after the collision is small when the collision is completely inelastic (-1.34\%, +3.01\%). The difference becomes more significant in elastic collisions (-4.00\%, -5.69\%). However, it is also noticed that the period of elastic collision is about twice as long as the inelastic, which can help explain the growing difference. Since friction stays almost constant, if we double the period of collision, the negative impulse caused by friction also gets doubled. This results in a larger drop in the momentum of the system. Thus with the effect of friction filtered, momentum is likely conserved in all types of collisions.
+
+\subsection{Kinetic Energy Conserved Only in Elastic Collisions}
+The loss of kinetic energy of the system is minor in elastic collisions (-1.75\%, -9.45\%), and drastically higher in inelastic collisions (-52.02\%, -73.31\%). These results suggest that kinetic energy is conserved only in elastic collisions.
+\subsection{Momentum During the Period of Collision}
+The behaviors of momentum during inelastic and elastic collisions are different. During inelastic collisions, momentum first rises sharply and then falls to around the initial momentum (Figure 1, 3). This phenomenon is not yet well understood. During elastic collisions, momentum fluctuates within a short period before it reaches approximately the initial level (Figure 5, 7).
+\subsection{Kinetic Energy During the Period of Collision}
+The behaviors of kinetic energy during inelastic and elastic collisions are also different. During inelastic collisions, kinetic energy drops steeply without much fluctuation, as it is transformed into heat (Figure 2, 4). During elastic collisions, kinetic energy first plummets, and then goes back up to the initial level (Figure 6, 8). This behavior can be explained by the kinetic energy transforming into elastic potential energy temporarily stored in the carts, and transforming back after the collision.
+
+\end{document}

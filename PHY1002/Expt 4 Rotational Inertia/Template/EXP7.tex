@@ -1,0 +1,70 @@
+
+\include{command}
+\rmfamily
+
+\section{Rectangular Bar Pendulum: Minimum Period}
+\subsection{$x-T$ Plot}
+
+\begin{figure}[H]
+	\centering\includegraphics[width=10cm]{icm1}
+	\caption{Relationship of pivot-CM distance $x$ and period of the pendulum $T$ }
+	\label{$Frequency-Intensity$ Graph for $70$cm tube}
+\end{figure}
+
+\subsection{Minimum Period}
+
+The following table records $x_0$ ($x$ that gives the minimum period) and $T_{\text{min}}$, obtained both from the experiment and theory. The percentage differences of the experimental values from predictions are calculated for comparison.\\
+
+
+\begin{table}[!htb]
+\centering
+\begin{tabular}{|c|c|c|c|}
+	\hline 
+	& Experiment & Prediction & Relative Difference \\ 
+	\hline 
+	$x_0$ (cm) & 8.00 & 8.05 & $-0.62\%$ \\ 
+	\hline 
+	$T_{\text{min}}$ (s) & 0.810 & 0.807 & $+0.37\%$ \\ 
+	\hline 
+\end{tabular}
+\caption{Values of $x_0$ and corresponding minimum period $T_{\text{min}}$}
+\end{table}
+
+The experimental values fit well with our theory.
+ 
+\section{Rotational Inertia of a Disk}
+\subsection{Raw Data}
+$$T=0.494\pm0.001\text{ s}$$
+$$M=89.37\pm0.02\text{ g}$$
+$$d=R=4.0\pm0.1\text{ cm}$$
+$$g=9.78\pm0.01\text{ N}\cdot \text{kg}^{-1}$$
+
+\subsection{Rotational Inertia about CM}
+The experimental value of rotational inertia about CM is given by
+$$I_{\text{exp}}=
+\frac{T^2Mgd}{4\pi^2}-Md^2=(7.31\pm 0.20) \times 10^{-5}\text{ kg}\cdot \text{m}^{2}
+$$
+and the theoretical value given by
+$$I_{\text{theo}}=\frac12MR^2=(7.15\pm 0.36) \times 10^{-5}\text{ kg}\cdot \text{m}^{2}
+$$
+with a relative difference of
+$$\frac{I_{\text{exp}}-I_{\text{theo}}}{I_{\text{theo}}}=2.24 \ \%$$
+
+
+\section{Rotational Inertia of an Irregular Pendulum}
+\subsection{Raw Data}
+$$M=10.07\pm0.02\text{ g}$$
+$$r=1.4\pm0.1\text{ cm}$$
+$$g=9.78\pm0.01\text{ N}\cdot \text{kg}^{-1}$$
+\subsection{$t-\omega$ Plot and $I_{\text{CM}}$ of the Irregular Pendulum}
+\begin{figure}[H]
+	\centering\includegraphics[width=10cm]{icm2}
+	\caption{Relationship of angular velocity $\omega$ and time $t$ }
+	\label{$Frequency-Intensity$ Graph for $70$cm tube}
+\end{figure}
+
+A linear regression of the $t-\omega$ curve during one period of acceleration yields
+$$\alpha=|\dot{\omega}|=22.53\pm0.04\text{ rad}\cdot\text{s}^{-2}$$
+The rotational inertia of the irregular pendulum about its CM can be found, via
+$$I_{\text{CM}}=Mr(\frac{g}{\alpha}-r)=(5.92\pm0.41)\times 10^{-5}\text{ kg}\cdot \text{m}^{2}$$
+\end{document}

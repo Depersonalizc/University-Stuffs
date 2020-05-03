@@ -1,0 +1,12 @@
+\contentsline {section}{\numberline {1}Total Momentum and Kinetic Energy in Different Collisions}{2}
+\contentsline {section}{\numberline {2}Plots}{2}
+\contentsline {subsection}{\numberline {2.1}Completely Inelastic Collision of Equal Mass}{2}
+\contentsline {subsection}{\numberline {2.2}Completely Inelastic Collision of Unequal Mass}{3}
+\contentsline {subsection}{\numberline {2.3}Elastic Collision of Equal Mass}{3}
+\contentsline {subsection}{\numberline {2.4}Elastic Collision of Unequal Mass}{4}
+\contentsline {section}{\numberline {3}Findings}{4}
+\contentsline {subsection}{\numberline {3.1}Loss of Momentum and Kinetic Energy}{4}
+\contentsline {subsection}{\numberline {3.2}Momentum Conserved in All Collisions}{4}
+\contentsline {subsection}{\numberline {3.3}Kinetic Energy Conserved Only in Elastic Collisions}{5}
+\contentsline {subsection}{\numberline {3.4}Momentum During the Period of Collision}{5}
+\contentsline {subsection}{\numberline {3.5}Kinetic Energy During the Period of Collision}{5}

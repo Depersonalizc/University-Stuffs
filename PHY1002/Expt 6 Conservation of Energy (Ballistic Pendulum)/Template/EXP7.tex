@@ -1,0 +1,46 @@
+
+\include{command}
+\rmfamily
+
+\section{$v_0$ through Maximum Angle}
+% Please add the following required packages to your document preamble:
+% \usepackage{booktabs}
+\begin{table}[!htb]
+	\centering
+	\begin{tabular}{@{}llrl@{}}
+		\toprule
+		\multicolumn{1}{c}{Measurement} & $\theta$ (rad) & \multicolumn{1}{l}{$h$ (m)} & $v_0$ (m/s) \\ \midrule
+		\multicolumn{1}{l|}{1} & \multicolumn{1}{l|}{0.284} & \multicolumn{1}{l|}{0.0153} & 5.56 \\
+		\multicolumn{1}{l|}{2} & \multicolumn{1}{l|}{0.282} & \multicolumn{1}{l|}{0.0151} & 5.52 \\
+		\multicolumn{1}{l|}{3} & \multicolumn{1}{l|}{0.286} & \multicolumn{1}{l|}{0.0156} & 5.60 \\
+		\multicolumn{1}{l|}{4} & \multicolumn{1}{l|}{0.284} & \multicolumn{1}{l|}{0.0153} & 5.56 \\
+		\multicolumn{1}{l|}{5} & \multicolumn{1}{l|}{0.283} & \multicolumn{1}{l|}{0.0152} & 5.54 \\ \midrule
+		\multicolumn{1}{l|}{Avg. $\pm$ SE} & \multicolumn{1}{l|}{0.284$\ \pm 0.001$} & \multicolumn{1}{l|}{0.0153$\ \pm 0.0001$} & 5.56$\ \pm 0.01$ \\ \bottomrule
+	\end{tabular}
+\end{table}
+
+\section{$v_0$ through Direct Measurements}
+% Please add the following required packages to your document preamble:
+% \usepackage{booktabs}
+\begin{table}[!htb]
+	\centering
+	\begin{tabular}{@{}ll@{}}
+		\toprule
+		\multicolumn{1}{c}{Measurement} & $v_0$ (m/s) \\ \midrule
+		\multicolumn{1}{l|}{1} & 5.49\\
+		\multicolumn{1}{l|}{2} & 5.55 \\
+		\multicolumn{1}{l|}{3} & 5.50 \\
+		\multicolumn{1}{l|}{4} & 5.47 \\
+		\multicolumn{1}{l|}{5} & 5.46 \\ \midrule
+		\multicolumn{1}{l|}{Avg. $\pm$ SE} & 5.46$\ \pm 0.02$ \\ \bottomrule
+	\end{tabular}
+\end{table}
+
+\section{Discussion}
+As shown in the tables above, the value of $v_0$ obtained by measuring the maximum swinging angle of the pendulum (5.56$\ \pm 0.01$) was slightly higher than that obatained by direct measurements (5.46$\ \pm 0.02$), by a percentage of
+$$
+\frac{5.56-5.46}{5.46} = +1.83\%
+$$Still, this difference exceeds the range of uncertainty and suggests that a systematic error was likely present in the experiment. First, mechanical energy during collisions was likely not conserved due to friction. However, this transformation of mechanical energy into heat should have produced a negative difference, instead of a positive one. Therefore, a second source of error was suspected: In the experiment, it was noticed that the pendulum was not at the exact height of the ballistic trajectory. Rather, it was tilted upwards at the very beginning. This means that the pendulum had already possessed some initial angular displacement $\theta_0$ before being struck by the bullet. This $\theta_0$ results in a positive systematic error in the swinging angle $\theta$, and in turns, a larger $v_0$ than the actual value.
+
+The experiment demonstrates the importance of error analysis. The systematic error in the experiment produced noticeable difference in the final result. In particular, the initial tilting of the pendulum was suspected to have caused a higher experimental value of $v_0$ than the actual value from direct measurements.
+\end{document}

@@ -1,0 +1,15 @@
+\contentsline {section}{\numberline {1}Introduction}{2}
+\contentsline {section}{\numberline {2}Theory}{2}
+\contentsline {subsection}{\numberline {2.1}Conservation of Angular Momentum}{2}
+\contentsline {subsubsection}{\numberline {2.1.1}Dropping Ring}{3}
+\contentsline {subsubsection}{\numberline {2.1.2}Dropping Disk}{3}
+\contentsline {subsection}{\numberline {2.2}Conservation of Rational Kinetic Energy}{3}
+\contentsline {section}{\numberline {3}Procedures}{3}
+\contentsline {subsection}{\numberline {3.1}Parameters Collection}{3}
+\contentsline {subsection}{\numberline {3.2}Setup}{4}
+\contentsline {subsection}{\numberline {3.3}Ring-on-Disk Collision}{4}
+\contentsline {subsection}{\numberline {3.4}Disk-on-Disk Collision}{5}
+\contentsline {section}{\numberline {4}Data and Error}{5}
+\contentsline {subsection}{\numberline {4.1}Measured Quantities}{5}
+\contentsline {subsection}{\numberline {4.2}Derived Quantities}{7}
+\contentsline {section}{\numberline {5}Conclusion}{8}

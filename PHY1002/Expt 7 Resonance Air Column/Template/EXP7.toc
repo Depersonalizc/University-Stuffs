@@ -1,0 +1,16 @@
+\contentsline {section}{\numberline {1}Introduction}{2}
+\contentsline {section}{\numberline {2}Setup}{2}
+\contentsline {section}{\numberline {3}Experiment (Part 1)}{2}
+\contentsline {subsection}{\numberline {3.1}Theory}{3}
+\contentsline {subsection}{\numberline {3.2}Procedure}{3}
+\contentsline {subsection}{\numberline {3.3}Raw Data}{3}
+\contentsline {subsection}{\numberline {3.4}Calculating the Speed of Sound}{4}
+\contentsline {subsection}{\numberline {3.5}End Effect}{5}
+\contentsline {subsection}{\numberline {3.6}Further Investigations}{5}
+\contentsline {section}{\numberline {4}Experiment (Part 2)}{6}
+\contentsline {subsection}{\numberline {4.1}Theory}{6}
+\contentsline {subsection}{\numberline {4.2}Procedure}{7}
+\contentsline {subsection}{\numberline {4.3}Raw Data}{7}
+\contentsline {subsection}{\numberline {4.4}Discussions}{7}
+\contentsline {subsection}{\numberline {4.5}Further Investigations}{9}
+\contentsline {section}{\numberline {A}Raw Figures}{10}
