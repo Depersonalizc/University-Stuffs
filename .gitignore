@@ -42,3 +42,7 @@ CSC3002/CS106BX-Reader_2.pdf
 elf_bin
 elf_bin.elf
 map.map
+
+# Zips
+*.zip
+*.7z
