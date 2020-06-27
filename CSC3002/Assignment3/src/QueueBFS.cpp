@@ -11,7 +11,15 @@
 
 void visit(Node* node);
 
-void breadthFirstSearch(Node* start, Set<Node*> & searched) {
+/*
+ * Function: breadthFirstSearch
+ * Usage: breadthFirstSearch(node);
+ * ---------------------------------
+ * Begins a BFS starting at the specified node.
+ */
+
+void breadthFirstSearch(Node* start) {
+    Set<Node*> searched; // contains nodes which have already been searched
     Queue<Node*> q {start}; // contains nodes whose neighbors are to be searched in order
     visit(start);
     searched.add(start);

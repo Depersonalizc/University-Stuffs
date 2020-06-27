@@ -66,7 +66,7 @@ uut.instrMemory[19] = {6'b000000, `gr1, `gr2, `gr3, 5'b00000, 6'b000110};  // sr
 uut.instrMemory[20] = {6'b000000, `gr1, `gr2, `gr3, 5'b00000, 6'b000111};  // srav gr3, gr2, gr1 (gr3 <= gr2 >>> gr1)
 uut.instrMemory[21] = {6'b000000, `gr1, `gr2, `gr3, 5'b00000, 6'b101010};  // slt gr3, gr1, gr2 (gr3 <= gr1 < gr2)
 uut.instrMemory[22] = {6'b000100, `gr1, `gr2, 16'hffff};  // beq gr1, gr2, -1 (branch -1 if gr1 - gr2 == 0)
-uut.instrMemory[26] = {6'b000101, `gr1, `gr2, 16'h0003};  // bne gr0, gr0, 3 (branch 3 if gr1 - gr2 != 0)
+uut.instrMemory[26] = {6'b000101, `gr1, `gr2, 16'h0004};  // bne gr0, gr0, 3 (branch 3 if gr1 - gr2 != 0)
 uut.instrMemory[30] = {6'b000000, `gr1, `gr2, `gr3, 5'b00000, 6'b100000};  // add gr3, gr1, gr2 (gr3 <= gr1 + gr2)
 uut.instrMemory[31] = {6'b000010, 26'h000008c};  // j 0x8c (jump to 0x8c unconditionally)
 uut.instrMemory[35] = {6'b000011, 26'h000009c};  // jal 0x9c (jump to 0x9c and link)

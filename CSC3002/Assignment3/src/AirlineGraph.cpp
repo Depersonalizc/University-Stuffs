@@ -12,7 +12,6 @@
 #include "stack.h"
 #include "queue.h"
 #include "console.h"
-#include "error.h"
 using namespace std;
 
 /* Function prototypes */
@@ -22,8 +21,8 @@ void initAirlineGraph(SimpleGraph & airline);
 void addFlight(SimpleGraph & airline, string c1, string c2, int miles);
 void addNode(SimpleGraph & g, string name);
 void addArc(SimpleGraph & g, Node* n1, Node* n2, double cost);
-void depthFirstSearch(Node* start, Set<Node*> & searched);
-void breadthFirstSearch(Node* start, Set<Node*> & searched);
+void depthFirstSearch(Node* start);
+void breadthFirstSearch(Node* start);
 void visit(Node* node);
 
 /*
@@ -144,18 +143,15 @@ int main() {
    SimpleGraph airline;
    initAirlineGraph(airline);
    string name;
-   Set<Node*> visited;
    while (true) {
         printAdjacencyLists(airline);
         cout << "Starting city: ";
         getline(cin, name);
         if (airline.nodeMap[name]) {
-            visited = {};
             cout << "Depth-first search: " << endl;
-            depthFirstSearch(airline.nodeMap[name], visited);
-            visited = {};
+            depthFirstSearch(airline.nodeMap[name]);
             cout << "Breadth-first search: " << endl;
-            breadthFirstSearch(airline.nodeMap[name], visited);
+            breadthFirstSearch(airline.nodeMap[name]);
             cout << "Press Enter to search again from another city...";
             getline(cin, name);
         } else {
