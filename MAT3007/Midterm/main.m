@@ -1,12 +1,13 @@
 tic;
 % setup
 zoom    = 1;
-U       = rgb2gray(imread('C:\Users\chen1\Documents\University-Stuffs\MAT3007\Midterm\test_images\640_640_lion_grey.png'));
+U       = imread('.\test_images\512_512_lena.png');
+%U       = rgb2gray(U);
 U       = imresize(U, zoom);
 U       = double(U) / 255;
 [m, n]  = size(U);
 
-Ind     = imread('C:\Users\chen1\Documents\University-Stuffs\MAT3007\Midterm\test_masks\640_640_mesh.png');
+Ind     = imread('.\test_masks\512_512_random90.png');
 Ind     = logical(ceil(Ind / 255));
 Ind     = imresize(Ind, zoom);
 s       = sum(Ind, 'all');
@@ -40,12 +41,13 @@ ze      = sparse(s, m*n);
 c       = [zeros(m*n, 1); ones(m*n, 1)];
 M       = [-Psi -I; Psi -I; -A ze; A ze];
 d       = [zeros(2*m*n, 1); del-b; del+b];
-options = optimoptions('linprog', 'Algorithm', 'interior-point');
-x       = linprog(c, M, d, [], [], zeros(1,2*m*n), ones(1,m*n), options);
+options = optimoptions('linprog', 'Algorithm', 'interior-point', 'ConstraintTolerance', 1e-3, 'Display', 'iter');
+x       = linprog(c, M, d, [], [], [], [], options);
 
 % scale and transform the stacked 
 % image back into matrix
-x = uint8(x(1:m*n) * 255);
+x = uint8(x(1:m*n) / 255);
 X = blk_unstack(x, bsz);
+psnr = PSNR((U*255), double(X));
 imshow(X);
 toc
