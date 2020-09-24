@@ -1,5 +1,6 @@
 
 CSC3002/CS106BX-Reader_2.pdf
+MAT3007/cvx
 
 # Prerequisites
 *.d
@@ -46,3 +47,4 @@ map.map
 # Zips
 *.zip
 *.7z
+*.asv
