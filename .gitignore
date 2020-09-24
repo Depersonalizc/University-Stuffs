@@ -48,3 +48,5 @@ map.map
 *.zip
 *.7z
 *.asv
+Research/MichiGAN/
+*.pro
