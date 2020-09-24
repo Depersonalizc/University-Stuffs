@@ -6,6 +6,8 @@ $$
 $$
 where $\Psi_{mn\times mn}$ transfers the image $x$ to the frequency domain; $A_{s\times mn}$ and $b\in\R^s$ are as in the Total Variation Minimization Problem formulation, and $\delta\gt\mathbb0$ is the error threshold between the undamaged pixels $b$ and the reconstructed version $Ax.$
 
+## LP Formulation
+
 We first reformulate $(3)$ as a linear program by noting that
 $$
 \begin{aligned}
@@ -19,7 +21,9 @@ $$
 $$
 Here, $\mathbf1$ denotes the all-one vectors of appropriate sizes and $|v|$ is interpreted element-wise on vector $v.$
 
-Next, we derive the associated dual of $(4).$ Rewrite $(4)$
+## Dual Problem
+
+Next, we derive the associated dual of $(4).$ Rewrite $(4)$ in matrix form
 $$
 \begin{aligned}
 &\quad\ \min_{x,t\in\R^{mn}}\  \mathbf1^\top t\qquad\text{s.t.}\qquad t\ge\pm\Psi x, \quad \pm\left(A x-b\right)\le\delta\mathbf1
@@ -40,7 +44,7 @@ x\\t
 \left[\begin{array}{c}
 0\\0\\-\delta\mathbf1+ b
 \\-\delta\mathbf1- b
-\end{array}\right].
+\end{array}\right],
 \end{aligned}
 $$
 where $I_r$ denotes the $r\times r$ identity matrix and $0_{p\times q}$ is the $p\times q$ all-zero matrix.

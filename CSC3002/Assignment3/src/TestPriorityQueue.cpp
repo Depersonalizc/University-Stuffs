@@ -11,27 +11,30 @@
 //#include "Q2_pqueue_heap.h"
 using namespace std;
 
-/* Main test function*/
+class A {
+public:
+    int a;
+    A() {a = 1;}
+    virtual void disp() {cout << a << endl;}
+};
 
-//int main() {
-//   PriorityQueue<string> pq;
-//   pq.peek();
-//   assert(pq.size() == 0);
-//   assert(pq.isEmpty());
-//   pq.enqueue("A", 1);
-//   assert(!pq.isEmpty());
-//   assert(pq.peek() == "A");
-//   pq.enqueue("D", 3);
-//   pq.enqueue("C", 2);
-//   pq.enqueue("B", 1);
-//   assert(pq.peek() == "A");
-//   assert(pq.size() == 4);
-//   assert(pq.dequeue() == "A");
-//   assert(pq.peek() == "B");
-//   assert(pq.dequeue() == "B");
-//   assert(pq.dequeue() == "C");
-//   assert(pq.dequeue() == "D");
-//   assert(pq.isEmpty());
-//   cout << "Priority queue test succeeded" << endl;
-//   return 0;
-//}
+class B : public A {
+public:
+    int b;
+    B() {b = 2;}
+    void disp() {cout << a << b << endl;}
+};
+
+class C : public B {
+public:
+    int c;
+    C() {b = 1; c = 3;}
+    void disp() {cout << a << b << c << endl;}
+};
+
+int main() {
+    C oc;
+    B* pb = &oc;
+    pb->disp();
+    return 0;
+}

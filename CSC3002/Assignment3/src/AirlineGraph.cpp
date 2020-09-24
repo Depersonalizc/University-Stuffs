@@ -139,23 +139,23 @@ void visit(Node* node) {
 
 /* Main program */
 
-int main() {
-   SimpleGraph airline;
-   initAirlineGraph(airline);
-   string name;
-   while (true) {
-        printAdjacencyLists(airline);
-        cout << "Starting city: ";
-        getline(cin, name);
-        if (airline.nodeMap[name]) {
-            cout << "Depth-first search: " << endl;
-            depthFirstSearch(airline.nodeMap[name]);
-            cout << "Breadth-first search: " << endl;
-            breadthFirstSearch(airline.nodeMap[name]);
-            cout << "Press Enter to search again from another city...";
-            getline(cin, name);
-        } else {
-            cout << "City not found. Try again. (Make sure input is in English!)" << endl;
-        }
-   }
-}
+//int main() {
+//   SimpleGraph airline;
+//   initAirlineGraph(airline);
+//   string name;
+//   while (true) {
+//        printAdjacencyLists(airline);
+//        cout << "Starting city: ";
+//        getline(cin, name);
+//        if (airline.nodeMap[name]) {
+//            cout << "Depth-first search: " << endl;
+//            depthFirstSearch(airline.nodeMap[name]);
+//            cout << "Breadth-first search: " << endl;
+//            breadthFirstSearch(airline.nodeMap[name]);
+//            cout << "Press Enter to search again from another city...";
+//            getline(cin, name);
+//        } else {
+//            cout << "City not found. Try again. (Make sure input is in English!)" << endl;
+//        }
+//   }
+//}

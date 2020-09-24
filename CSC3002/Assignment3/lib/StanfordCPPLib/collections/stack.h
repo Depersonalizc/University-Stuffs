@@ -44,7 +44,7 @@
 #undef INTERNAL_INCLUDE
 
 /*
- * Class: Stack<ValueType>
+ * Class: Stack<T>
  * -----------------------
  * This class models a linear structure called a <b><i>stack</i></b>
  * in which values are added and removed only from one end.
@@ -53,12 +53,12 @@
  * operations are <code>push</code> (add to top) and <code>pop</code>
  * (remove from top).
  */
-template <typename ValueType>
+template <typename T>
 class Stack {
 public:
     /*
      * Constructor: Stack
-     * Usage: Stack<ValueType> stack;
+     * Usage: Stack<T> stack;
      * ------------------------------
      * Initializes a new empty stack.
      */
@@ -66,11 +66,11 @@ public:
 
     /*
      * Constructor: Stack
-     * Usage: Stack<ValueType> stack {1, 2, 3};
+     * Usage: Stack<T> stack {1, 2, 3};
      * ----------------------------------------
      * Initializes a new stack that stores the given elements from bottom-top.
      */
-    Stack(std::initializer_list<ValueType> list);
+    Stack(std::initializer_list<T> list);
 
     /*
      * Destructor: ~Stack
@@ -86,7 +86,7 @@ public:
      * Pushes the specified value onto the top of this stack.
      * A synonym for the push method.
      */
-    void add(const ValueType& value);
+    void add(const T& value);
     
     /*
      * Method: clear
@@ -104,7 +104,7 @@ public:
      * as the given other stack.
      * Identical in behavior to the == operator.
      */
-    bool equals(const Stack<ValueType>& stack2) const;
+    bool equals(const Stack<T>& stack2) const;
     
     /*
      * Method: isEmpty
@@ -116,21 +116,21 @@ public:
     
     /*
      * Method: peek
-     * Usage: ValueType top = stack.peek();
+     * Usage: T top = stack.peek();
      * ------------------------------------
      * Returns the value of top element from this stack, without removing
      * it.  This method signals an error if called on an empty stack.
      */
-    ValueType peek() const;
+    T peek() const;
     
     /*
      * Method: pop
-     * Usage: ValueType top = stack.pop();
+     * Usage: T top = stack.pop();
      * -----------------------------------
      * Removes the top element from this stack and returns it.  This
      * method signals an error if called on an empty stack.
      */
-    ValueType pop();
+    T pop();
     
     /*
      * Method: push
@@ -138,16 +138,16 @@ public:
      * -------------------------
      * Pushes the specified value onto the top of this stack.
      */
-    void push(const ValueType& value);
+    void push(const T& value);
 
     /*
      * Method: remove
-     * Usage: ValueType top = stack.remove();
+     * Usage: T top = stack.remove();
      * -----------------------------------
      * Removes the top element from this stack and returns it.
      * A synonym for the pop method.
      */
-    ValueType remove();
+    T remove();
 
     /*
      * Method: size
@@ -159,7 +159,7 @@ public:
     
     /*
      * Method: top
-     * Usage: ValueType top = stack.top();
+     * Usage: T top = stack.top();
      * ------------------------------------
      * Returns the value of top element from this stack, without removing
      * it.  This method signals an error if called on an empty stack.  For
@@ -167,7 +167,7 @@ public:
      * under the name <code>top</code>, in which case it returns the value
      * by reference.
      */
-    ValueType& top();
+    T& top();
 
     /*
      * Method: toString
@@ -200,7 +200,7 @@ public:
      * Usage: if (stack1 < stack2) ...
      * -------------------------------
      * Relational operators to compare two stacks.
-     * The <, >, <=, >= operators require that the ValueType has a < operator
+     * The <, >, <=, >= operators require that the T has a < operator
      * so that the elements can be compared pairwise.
      */
     bool operator <(const Stack& stack2) const;
@@ -224,14 +224,14 @@ public:
      * underlying Vector class.
      */
 
-    template <typename T>
-    friend int hashCode(const Stack<T>& s);
+    template <typename TYPE>
+    friend int hashCode(const Stack<TYPE>& s);
     
-    template <typename T>
-    friend std::ostream& operator <<(std::ostream& os, const Stack<T>& stack);
+    template <typename TYPE>
+    friend std::ostream& operator <<(std::ostream& os, const Stack<TYPE>& stack);
     
 private:
-    Vector<ValueType> _elements;
+    Vector<T> _elements;
 };
 
 /*
@@ -242,115 +242,115 @@ private:
  * methods can be implemented in as single line.
  */
 
-template <typename ValueType>
-Stack<ValueType>::Stack(std::initializer_list<ValueType> list) : _elements(list) {
+template <typename T>
+Stack<T>::Stack(std::initializer_list<T> list) : _elements(list) {
 
 }
 
-template <typename ValueType>
-void Stack<ValueType>::add(const ValueType& value) {
+template <typename T>
+void Stack<T>::add(const T& value) {
     push(value);
 }
 
-template <typename ValueType>
-void Stack<ValueType>::clear() {
+template <typename T>
+void Stack<T>::clear() {
     _elements.clear();
 }
 
-template <typename ValueType>
-bool Stack<ValueType>::equals(const Stack<ValueType>& stack2) const {
+template <typename T>
+bool Stack<T>::equals(const Stack<T>& stack2) const {
     return stanfordcpplib::collections::equals(_elements, stack2._elements);
 }
 
-template <typename ValueType>
-bool Stack<ValueType>::isEmpty() const {
+template <typename T>
+bool Stack<T>::isEmpty() const {
     return size() == 0;
 }
 
-template <typename ValueType>
-ValueType Stack<ValueType>::peek() const {
+template <typename T>
+T Stack<T>::peek() const {
     if (isEmpty()) {
         error("Stack::peek: Attempting to peek at an empty stack");
     }
     return _elements.back();
 }
 
-template <typename ValueType>
-ValueType Stack<ValueType>::pop() {
+template <typename T>
+T Stack<T>::pop() {
     if (isEmpty()) {
         error("Stack::pop: Attempting to pop an empty stack");
     }
     return _elements.pop_back();
 }
 
-template <typename ValueType>
-void Stack<ValueType>::push(const ValueType& value) {
+template <typename T>
+void Stack<T>::push(const T& value) {
     _elements.push_back(value);
 }
 
-template <typename ValueType>
-ValueType Stack<ValueType>::remove() {
+template <typename T>
+T Stack<T>::remove() {
     return pop();
 }
 
-template <typename ValueType>
-int Stack<ValueType>::size() const {
+template <typename T>
+int Stack<T>::size() const {
     return _elements.size();
 }
 
-template <typename ValueType>
-ValueType & Stack<ValueType>::top() {
+template <typename T>
+T & Stack<T>::top() {
     if (isEmpty()) {
         error("Stack::top: Attempting to read top of an empty stack");
     }
     return _elements.back();
 }
 
-template <typename ValueType>
-std::string Stack<ValueType>::toString() const {
+template <typename T>
+std::string Stack<T>::toString() const {
     std::ostringstream os;
     os << *this;
     return os.str();
 }
 
-template <typename ValueType>
-bool Stack<ValueType>::operator ==(const Stack& stack2) const {
+template <typename T>
+bool Stack<T>::operator ==(const Stack& stack2) const {
     return _elements == stack2._elements;
 }
 
-template <typename ValueType>
-bool Stack<ValueType>::operator !=(const Stack & stack2) const {
+template <typename T>
+bool Stack<T>::operator !=(const Stack & stack2) const {
     return _elements != stack2._elements;
 }
 
-template <typename ValueType>
-bool Stack<ValueType>::operator <(const Stack & stack2) const {
+template <typename T>
+bool Stack<T>::operator <(const Stack & stack2) const {
     return _elements < stack2._elements;
 }
 
-template <typename ValueType>
-bool Stack<ValueType>::operator <=(const Stack & stack2) const {
+template <typename T>
+bool Stack<T>::operator <=(const Stack & stack2) const {
     return _elements <= stack2._elements;
 }
 
-template <typename ValueType>
-bool Stack<ValueType>::operator >(const Stack & stack2) const {
+template <typename T>
+bool Stack<T>::operator >(const Stack & stack2) const {
     return _elements > stack2._elements;
 }
 
-template <typename ValueType>
-bool Stack<ValueType>::operator >=(const Stack & stack2) const {
+template <typename T>
+bool Stack<T>::operator >=(const Stack & stack2) const {
     return _elements >= stack2._elements;
 }
 
-template <typename ValueType>
-std::ostream& operator <<(std::ostream& os, const Stack<ValueType>& stack) {
+template <typename T>
+std::ostream& operator <<(std::ostream& os, const Stack<T>& stack) {
     return os << stack._elements;
 }
 
-template <typename ValueType>
-std::istream& operator >>(std::istream& is, Stack<ValueType>& stack) {
-    ValueType element;
+template <typename T>
+std::istream& operator >>(std::istream& is, Stack<T>& stack) {
+    T element;
     return stanfordcpplib::collections::readCollection(is, stack, element, /* descriptor */ "Stack::operator >>");
 }
 
