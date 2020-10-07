@@ -1,4 +1,4 @@
-﻿using LinearAlgebra
+using LinearAlgebra
 
 r(x) = rand(10, 10)
 A, B, C = r.(1:3)

@@ -1,4 +1,4 @@
-﻿// regs save fake 32-bit address!!!!!
+// regs save fake 32-bit address!!!!!
 
 #include <QCoreApplication>
 #include <iostream>
