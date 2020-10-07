@@ -1,7 +1,5 @@
 # !/bin/env python
 # -*- coding:utf-8 -*-
-from msvcrt import getch
-
 
 def swap(lst, i_1, i_2):
     lst[i_1], lst[i_2] = lst[i_2], lst[i_1]
@@ -16,7 +14,7 @@ def solvable(puzzle):
             if puzzle[i] > puzzle[j]:           # count number of inversions
                 inv += 1
 
-    return True if inv % 2 == 0 else False
+    return inv % 2 == 0
 
 
 def generate_pzl():                        # return a solvable puzzle as a list
@@ -50,15 +48,15 @@ def solved(puzzle):
         7, 8, 9,
     ]
 
-    return True if puzzle == solved else False
+    return puzzle == solved
 
 
 def possible_dir(puzzle):
                                         # return a list of possible directions
     dirs = [
-        'u, l', 'u, l, r', 'u, r'
+        'u, l'   , 'u, l, r'   ,    'u, r'
         'u, l, d', 'u, l, d, r', 'u, d, r'
-        'l, d', 'l, d, r', 'd, r'
+        'l, d'   , 'l, d, r'   ,    'd, r'
     ]
 
     return dirs[puzzle.index(' ')]
@@ -89,7 +87,7 @@ def new_game():
         while True:                        # obtain direction to slide from user
 
             try:
-                direction = bytes.decode(getch()).lower()
+                direction = input()
                 if direction in possible_dir(puzzle):
                     break
 
@@ -114,7 +112,7 @@ if __name__ == '__main__':
     print('Welcome to 8-puzzle game...',
           'Press any key to start >', sep='\n', end='')
 
-    getch()                          # wait for user's response
+    input()                          # wait for user's response
 
     while True:
 
@@ -126,11 +124,11 @@ if __name__ == '__main__':
 
         while True:
 
-            newGame = bytes.decode(getch()).upper()
+            newGame = input().lower()
 
-            if newGame in ['Y', 'N']:
+            if newGame in ['y', 'n']:
                 break
 
-        if newGame == 'N':
+        if newGame == 'n':
             print('\nExiting...')
             break
