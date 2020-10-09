@@ -47,10 +47,4 @@ int main()
     for (int i = 0; i < N; i++) {
         cout << arr[i] << endl;
     }
-
-//    uint32_t arr[] = {1,8,9,2,3};
-//    merge(arr, 0, 2, 4);
-////    for (int i = 0; i < 5; i++) {
-////        cout << arr[i] << ", ";
-////    }
 }
