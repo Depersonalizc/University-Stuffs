@@ -1,14 +1,21 @@
+# Things Done (10.9)
+
+1. Read the MONO paper and written a brief summary of it. Decided to start working on the Segmentation section
+2. Coded the data loader together with image preprocessing. Looking good.
+3. Starting to gain familiarity with PyTorch & implemented some basic NN
+   - Built/Train an MLP tested on [MNIST](http://yann.lecun.com/exdb/mnist/dataset)
+   - Built/Train an easy CNN tested on
+     [Dogs vs. Cats](https://www.kaggle.com/c/dogs-vs-cats)
+
 # TODO
 
-1. Get familiar with PyTorch: https://www.youtube.com/watch?v=9aYuQmMJvjA&t=675s
-   - CNN
-   - Saving models
-   - Concatenating models
-2. Train the Segmentation Network
-3. Test the Segmentation Network
-4. 
+1. Understand more about the Segmentation Network:
+   1. Draw a clear picture of the architecture
+   2. What is the detection engine used for? why first detect before segmentation?
+   3. What is ROI_align?
 
-
+2. Implement the Segmentation Network
+3. (Train the Segmentation Network)
 
 # Paper summary: Monocular Real-Time Volumetric Performance Capture
 
@@ -41,7 +48,7 @@
 
   - Architecture: Modified upon [PIFu](PIFu.pdf). 
 
-    - Switched to **HRNetV2-W18-Small-v2** as **shape ==encoder==** for better quality and speed
+    - **HRNetV2-W18-Small-v2** as **shape ==encoder==** for better quality and speed
 
     - ###### 6 residual blocks for **color encoder** ([transposed convolution?](https://www.cnblogs.com/shine-lee/p/11559825.html) ***==Don't really understand here==***!) check out [conv_arithmetic.pdf](conv_arithmetic.pdf) !![image-20200930013415963](C:\Users\Jamie\AppData\Roaming\Typora\typora-user-images\image-20200930013415963.png)
 
@@ -52,15 +59,6 @@
     - Soft one-hot depth vector (**Soft-Z**)
     - Conditional batch normalization (**CBN**) for reducing channel size of MLP (==***Don't understand***==)
     - Train shape inference for 5 epochs, fix it and train texture (color?) inference for another 5 epochs (***which part exactly? ==Do we train the encoders?==***)
-
-  - Trainset: https://drive.google.com/file/d/1jDUddrJlUlv5O_JAdb8qZk45EwtEqf_4/view
-
-  - Valset: https://drive.google.com/file/d/1FPqz2P51sbnWo1K2FcowPnZCAGC1-_uY/view
-
-  - Testset: https://drive.google.com/file/d/1gPkkqwiXKaPWLIIrF7QfvHHOu0B3zDjB/view
-
-
-
 
 
 ## Segmentation (**U-Net**, **ResNet-18** backbone)
@@ -75,3 +73,4 @@
 
 ### Architecture
 
+*TODO*

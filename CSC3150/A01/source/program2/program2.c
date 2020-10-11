@@ -109,7 +109,7 @@ void my_wait(pid_t pid, int* stat, int flags) {
 
 int my_exec(void) {
 	int result;
-	const char path[] = "/home/seed/Documents/ass_1/program2/test";
+	const char path[] = "/home/seed/work/assignment1/source/program2/test;";
 	const char* const argv[] = {path, NULL, NULL};
 	const char* const envp[] = {"HOME=/", "PATH=/sbin:/user/sbin:/bin:/usr/bin", NULL};
 	struct filename* my_filename = getname(path);

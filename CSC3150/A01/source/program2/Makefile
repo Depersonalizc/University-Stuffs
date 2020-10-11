@@ -2,8 +2,8 @@ obj-m	:= program2.o
 KVERSION := $(shell uname -r)
 PWD	:= $(shell pwd)
 
-# CFILES:= $(shell ls|grep test.c)
-# PROGS:=$(patsubst %.c,%,$(CFILES))
+CFILES:= $(shell ls|grep test.c)
+PROGS:=$(patsubst %.c,%,$(CFILES))
 
 
 all: program2.c test.c
@@ -16,7 +16,7 @@ all: program2.c test.c
 
 clean:
 	$(MAKE) -C /lib/modules/$(KVERSION)/build M=$(PWD) clean
-	rm test
+	rm $(PROGS)
 
 # 	$(PROGS)
 # 	rm $(PROGS)

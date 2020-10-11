@@ -79,17 +79,8 @@ class LinReg:
         print("{:<13}{:<13.2f}{:<13.2f}{:<13.2}{:<13.2}\n".format("max error", self.a_max_err, self.b_max_err, "", ""))
 
 
-p = 0.445
-n = 314
-z = 0.055
+dinosaur = LinReg("Dinosaur", os.path.join(sys.path[0], 'D.csv'))
+star = LinReg("Star", os.path.join(sys.path[0], 'S.csv'))
 
-print(
-    z * (314/p/(1-p)) ** .5
-
-      )
-
-# dinosaur = LinReg("Dinosaur", os.path.join(sys.path[0], 'D.csv'))
-# star = LinReg("Star", os.path.join(sys.path[0], 'S.csv'))
-#
-# dinosaur.plot()
-# star.plot()
+dinosaur.plot()
+star.plot()

@@ -73,13 +73,16 @@ class DataBuilder:
                 pass
 
         print("Built", self.count, "data points!")
-        if save:
-            torch.save(self.training_data, name + '.pt')
+        if save: self.save_training_data(name)
+
+    def save_training_data(self, name='training_data'):
+        torch.save(self.training_data, name + '.pt')
 
     def load_training_data(self, data='./data/training_data.pt'):
         self.training_data = torch.load(data)
         self.img_size = self.training_data[0][1].size()[-1]
         self.count = len(self.training_data)
+        print("Loaded", self.count, "data points!")
 
     def show_data_point(self, i):
         if i < len(self):
@@ -98,11 +101,11 @@ class DataBuilder:
 
 
 if __name__ == "__main__":
-    data_builder = DataBuilder(256, "./data/JPEGImages", "./data/RemoveBG")
-    data_builder.build_training_data(save=True, name='./data/example')
-    data_builder.show_data_point(15)
-    print(len(data_builder))
+    data_builder = DataBuilder(256)
+    # data_builder.build_training_data(save=True, name='./data/example')
+    # data_builder.show_data_point(15)
+    # print(len(data_builder))
 
-    data_builder.load_training_data('./data/example.pt')
-    data_builder.show_data_point(15)
+    data_builder.load_training_data('H:/data/example.pt')
+    data_builder.show_data_point(50)
     print(len(data_builder))
