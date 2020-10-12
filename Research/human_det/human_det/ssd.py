@@ -62,7 +62,7 @@ class Detection:
             tensor = tensor.half()
         return tensor, H0, W0, scale
     
-    def __call__(self, tensor, class_names=["person"], topk=1):
+    def __call__(self, tensor, class_names=["person"], topk=2):
         """
         tensor should be [bz, 3, H, W] in [-1, 1], RGB
         """

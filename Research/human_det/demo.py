@@ -1,3 +1,5 @@
+# python demo.py --image_folder "C:/Users/Jamie/Documents/University-Stuffs/Research/project/data/JPEGImages" --loop --vis
+# python demo.py --images "C:/Users/Jamie/Desktop/zxy.jpg" --loop --vis
 import glob
 import tqdm
 import cv2
@@ -26,26 +28,44 @@ parser.add_argument(
     '--vis', action="store_true", help="whether to visualize.")
 args = parser.parse_args()
 
+def draw_bboxes(window, bboxes, probs):
+    bboxes = bboxes.view(-1, 1, 4).squeeze().cpu().numpy()
+    for bbox in bboxes:
+        window = cv2.rectangle(
+            window,
+            (int(bbox[0]), int(bbox[1])),
+            (int(bbox[2]), int(bbox[3])),
+            (255, 0, 0), 2)
+
 
 def visulization(data):
     image, bboxes, probs = data
-    probs = probs.unsqueeze(3)
-    bboxes = (bboxes * probs).sum(dim=1, keepdim=True) / probs.sum(dim=1, keepdim=True)
+    print(probs)
+
+    #probs = probs.unsqueeze(3)
+    #print(bboxes, probs, '\n')
+    #bboxes = (bboxes * probs).sum(dim=1, keepdim=True) / probs.sum(dim=1, keepdim=True)
+    #print(bboxes, probs)
+
+
     window = image[0].cpu().numpy().transpose(1, 2, 0)
     window = (window * 0.5 + 0.5) * 255.0
     window = np.uint8(window).copy()
-    bbox = bboxes[0, 0, 0].cpu().numpy()
-    window = cv2.rectangle(
-        window, 
-        (int(bbox[0]), int(bbox[1])), 
-        (int(bbox[2]), int(bbox[3])), 
-        (255,0,0), 2)
-    
-    window = cv2.cvtColor(window, cv2.COLOR_BGR2RGB) 
-    window = cv2.resize(window, (0, 0), fx=2, fy=2)
 
+    # bbox = bboxes[0, 0, 0].cpu().numpy()
+    # window = cv2.rectangle(
+    #     window,
+    #     (int(bbox[0]), int(bbox[1])),
+    #     (int(bbox[2]), int(bbox[3])),
+    #     (255,0,0), 2)
+    #
+    draw_bboxes(window, bboxes, probs)
+
+    window = cv2.cvtColor(window, cv2.COLOR_BGR2RGB)
+    window = cv2.resize(window, (0, 0), fx=2, fy=2)
+    #
     cv2.imshow('window', window)
-    cv2.waitKey(30)
+    cv2.waitKey(1)
 
 
 det_engine = human_det.Detection()
@@ -69,14 +89,14 @@ elif args.image_folder is not None:
 loader = torch.utils.data.DataLoader(
     data_stream, 
     batch_size=1, 
-    num_workers=1, 
+    num_workers=0,
     pin_memory=False,
 )
 
 
 try:
     # no vis: ~ 70 fps
-    for data in tqdm.tqdm(loader):
+    for data in loader:
         bboxes, probs = det_engine(data)
         if args.vis:
             visulization([data, bboxes, probs])
