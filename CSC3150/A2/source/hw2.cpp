@@ -23,19 +23,18 @@ char 	  status; 						  	    	/* game status = (g)ame, (d)ead, (q)uit */
 int       score = 0;                            	/* current score */
 int 	  hi = 0; 							    	/* highest score */
 pthread_t pth_kb, pth_dlog[ROW-2], pth_slog[ROW-2]; /* threads fetching kb and updating logs */
-static pthread_mutex_t mutex;						/* mutex for log spawing threads */
-pthread_cond_t fakeCond = PTHREAD_COND_INITIALIZER;
+pthread_mutex_t mutex;								/* mutex for log spawing threads */
 
-
-/**
- * convert screen coord. (x, y) into map 
- * index and return a reference to the item 
- */
-char & at_map(int x, int y) {return map[y][x + RIVER_SIDE_LEN];}
+/* convert screen coord. (x, y) into map 
+   index and return a reference 
+*/
+char & at_map(int x, int y) {
+	return map[y][x + LOG_MAX_LEN];
+}
 
 class Frog{
 public:
-	/* screen coordinates */
+	/* coordinates on screen */
 	int x, y;
 
 	/* constructor */
@@ -48,26 +47,23 @@ public:
 		x = _x; y = _y;
 	}
 
-	/* return true if frog on ground and in screen */
 	bool alive() {
 		return (at_map(x, y) == '=' || at_map(x, y) == '|') \
 				&& x >= 0 && x < COL;
 	}
 
-	/* draw frog on screen */
 	void draw() {
-		//printf("\u001b[32m");
-        printf("\u001b[32m\33[%d;%dH%s\u001b[0m", y+1, x+1, "@");
-		//printf("\u001b[0m");
+        printf("\33[s\u001b[32m\33[%d;%dH%s\u001b[0m\33[u", y+1, x+1, "@");
+		//printf(" (%d, %d)", x, y);
 		fflush(stdout);
 	}
 };
 
 Frog frog = Frog();
 
-/** Determine a keyboard is hit or not. 
- *  If yes, return 1. Otherwise return 0. 
- */
+/* Determine a keyboard is hit or not. 
+   If yes, return 1. Otherwise return 0. 
+*/
 int kbhit(void){
 	struct termios oldt, newt;
 	int ch;
@@ -96,7 +92,6 @@ int kbhit(void){
 	return 0;
 }
 
-/* return a random int from [l, u] */
 int rand_in(int l, int u) {
 	return rand() % (u - l + 1) + l;
 }
@@ -108,14 +103,6 @@ void scflush(const char* str = NULL) {
 	if (str) printf("%s\n", str);
 }
 
-void scflush_row(int y) {
-	printf("\033[%d;1H", y+1);
-	/* clear row y */
-	printf("\033[K"); 
-	fflush(stdout);
-}
-
-/* draw the map, frog, and scores on screen */
 void draw_map() {
 
 	scflush();
@@ -128,6 +115,7 @@ void draw_map() {
 	}
 
 	frog.draw();
+
 	/* print hi-score and current score */
 	printf("\33[%d;%dH%s%d", 1, COL+1, "BEST:", hi);
 	printf("\33[%d;%dH%s", 2, COL+1, "----------");
@@ -135,30 +123,31 @@ void draw_map() {
 	fflush(stdout);
 }
 
-void spawn_log_at_row(int y) {
+void spawn_log_at_row(int y, int xoff = 0) {
+	/* drift right if y is even! */
 	bool drift_right = (y % 2 == 0);
-	int log_len = LOG_MAX_LEN + rand_in(-LOG_LEN_VAR, 0);
+	int log_len = LOG_MAX_LEN + rand_in(-3, 0);
 	if (drift_right)
-		memset(&at_map(-log_len, y), '=', log_len);
+		memset(&at_map(-log_len + xoff, y), '=', log_len);
 	else
-		memset(&at_map(COL, y), '=', log_len);
+		memset(&at_map(COL - xoff, y), '=', log_len);
 }
 
-/* logs spawn threads */
 void* rand_spawn_logs_at_row(void* y) {
 	while (status == 'g') {
-		usleep(LOG_SLEEP_US * (LOG_MAX_LEN + 2 + rand_in(0, LOG_MAX_INT)));
 		spawn_log_at_row(*(int*)y);
-	} delete (int*)y;
+		usleep(LOG_SLEEP_US * (LOG_MAX_LEN + rand_in(5, 10)));
+	}
 }
 
-/** In every slp ms, drift logs, check frog status, 
-  * return if frog dies by hiting the wall.
-  */
+/* In every slp ms, drift logs, check frog status, 
+   return if game ends */
 void* drift_logs_at_row(void* py) {
+
 	int y = * (int*) py;
 	int t_off = LOG_SLEEP_VAR * LOG_SLEEP_US;
 	t_off = rand_in(-t_off, t_off);
+
 	while (status == 'g') {
 		usleep(LOG_SLEEP_US + t_off);
 
@@ -185,11 +174,6 @@ void* drift_logs_at_row(void* py) {
 		/* move frog and check status */
 		if (frog.y == y) {
 			frog.x += (y % 2 == 0)? 1 : -1;
-			/* exit if frog hits the wall */
-			if (frog.x < 0 || frog.x > COL) {
-				delete (int*) py;
-				pthread_exit(NULL); // ????? need to kill all threads!
-			}
 			frog.draw();
 		}
 	}
@@ -197,11 +181,12 @@ void* drift_logs_at_row(void* py) {
 	pthread_exit(NULL);
 }
 
-/** check kb indefinitely, if kb caught, update frog position,
-  * redraw map, and check frog status, return if game ends. 
-  */
+/* check kb indefinitely, if kb caught, update frog position,
+   redraw map, and check frog status, return if game ends */
 void* check_kb(void* _) {
 	while (true) {
+
+		/* kb activity caught! */
 		if (kbhit()) {
 			printf(
 				"\33[%d;%dH%s", frog.y+1, frog.x+1, 
@@ -209,7 +194,8 @@ void* check_kb(void* _) {
 			char dir = getchar();
 			switch (dir) {
 				case 'w': case 'W':
-					frog.jump_to(frog.x, frog.y-1); break;
+					frog.jump_to(
+						frog.x, frog.y-1); break;
 				case 's': case 'S':
 					frog.jump_to(
 						frog.x, frog.y >= ROW - 1? \
@@ -227,9 +213,10 @@ void* check_kb(void* _) {
 					pthread_exit(NULL);
 				default: break;
 			}
-			/* Frog could've moved. Redraw.*/
+			/* redraw frog */
 			frog.draw();
 		}
+			
 		if (!frog.alive()) {
 			status = 'd';
 			pthread_exit(NULL);
@@ -245,16 +232,15 @@ void* check_kb(void* _) {
 
 		printf("\33[s\33[%d;%dH%d\33[u", 1, COL+1+5, hi);
 		printf("\33[s\33[%d;%dH%d\33[u", 3, COL+1+6, score);
-
+	
 	}
 }
 
-/* initialize map with chars representing banks and water */
 void init_map() {
-	memset(map, 0, sizeof( map )) ;
+	memset( map, 0, sizeof( map ) ) ;
 	memset(&at_map(0, 0), '|', COL);
-	memset(&map[1], ' ', RIVER_AREA);
 	memset(&at_map(0, ROW-1), '|', COL);
+	memset(&map[1], ' ', RIVER_AREA);
 }
 
 /** flush stdin.
@@ -267,7 +253,6 @@ void clean_stdin() {
 	close(stdin_cpy);
 }
 
-/* set game difficulty */
 void choose_difficulty() {
 	scflush("Choose difficulty...\n1) EZ\n2) meh\n3) CRAAAZY!");
 	while (true) {
@@ -295,7 +280,7 @@ void choose_difficulty() {
 	}
 }
 
-int main(int argc, char *argv[]) {
+int main(int argc, char *argv[]){
 
 	/* hide cursor and echo*/
 	printf("\033[?25l");
@@ -305,34 +290,29 @@ int main(int argc, char *argv[]) {
     newt.c_lflag &= ~ECHO;
     tcsetattr(STDIN_FILENO, TCSANOW, &newt);
 
-	/* game body */
+	// pthread_mutex_t mutex;
+	// pthread_cond_t cond;
+
 	bool again = true;
 	while (again) {
-		/* set status to dead to trigger thread Log Spawn to end */
-		// status = 'd';
 
+		status = 'g';
 		choose_difficulty();
 		init_map();
-		frog.jump_to(COL / 2, ROW - 1);
+		frog.jump_to(COL/2, ROW-1);
 		draw_map();
 
-		/* countdown */
 		for (int i = 3; i >= 1; i--) {
-			printf("\33[%d;%dH%d\n", ROW / 2 + 1, COL / 2 + 1, i);
+			printf("\33[%d;%dH%d\n", ROW/2+1, COL/2+1, i);
 			usleep(1e6);
-		}   printf("\33[%d;%dH%s\n", ROW / 2 + 1, COL / 2, "GO!");
-		    usleep(1e6);
+		}   printf("\33[%d;%dH%s\n", ROW/2+1, COL/2, "GO!");
+			usleep(1e6);
 
-		/* flush unwanted input during countdown */
 		clean_stdin();
 
-		/* All threading happens here... */
-		status = 'g';
-		
-		pthread_mutex_init(&mutex, 0);
-	    
-		/* threads creation */
-		pthread_create(&pth_kb, NULL, check_kb, NULL);
+	    pthread_mutex_init(&mutex, NULL);
+
+	    pthread_create(&pth_kb, NULL, check_kb, NULL);
 	    for (int i = 0; i < ROW - 2; i++) {
 	    	int* y = new int;
 			int* py = new int;
@@ -346,20 +326,17 @@ int main(int argc, char *argv[]) {
 				drift_logs_at_row, (void*) py);
 		}
 
-		/* wait for dlog & kb thread to end */
+	    pthread_join(pth_kb, NULL);
 	    for (int i = 0; i < ROW - 2; i++) {
 			pthread_join(pth_dlog[i], NULL);
-			pthread_join(pth_slog[i], NULL);
 		}
-		pthread_join(pth_kb, NULL);
-
-		pthread_mutex_destroy(&mutex);
-
-		/* display the output for user: win, lose or quit. */
+    	pthread_mutex_destroy(&mutex);
+		
+		/*  Display the output for user: win, lose or quit.  */
 		switch (status) {
 			case 'w': scflush("FROGGY WINS!!!"); hi = 0; break;
-			case 'd': scflush("FROGGY DIEEEEEED!"); score = 0; break;
-			case 'q': scflush("FROGGY QUITS THE GAME!"); score = 0; break;
+			case 'd': scflush("FROGGY DIEEEEEED!"); break;
+			case 'q': scflush("FROGGY QUITS THE GAME!"); break;
 		}
 
 		printf("Play again? (Y)es / (N)o");
@@ -373,8 +350,9 @@ int main(int argc, char *argv[]) {
 			}
 		}
 	}
-	/* player decides to quit. flush screen */
+
 	scflush();
+
 	/* restore cursor and echo */
 	printf("\033[?25h");
 	tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
