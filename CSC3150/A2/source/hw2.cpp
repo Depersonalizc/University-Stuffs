@@ -13,15 +13,16 @@ const int COL = 50; 						    	/* width of screen */
 const int RIVER_SIDE_LEN = 15;						/* hidden side length of river */
 const int RIVER_LEN = COL + 2 * RIVER_SIDE_LEN; 	/* length of river */
 const int RIVER_AREA = RIVER_LEN * (ROW - 2);   	/* area of river */
-int       LOG_MAX_INT = 10;							/* decides max interval between logs */
 int 	  LOG_MAX_LEN = 8;				        	/* maximum log length */
 int       LOG_LEN_VAR = 3;							/* random variation of log length from max len*/
 float	  LOG_SLEEP_VAR = 0.5;						/* random variation of time interval of log drift from LOG_SLEEP_US */ 
+int       LOG_MAX_INT = 5;							/* maximum of random time interval of log drift */
 int 	  LOG_SLEEP_US = 1e5; 				    	/* time interval of log drift in us */
 char 	  map[ROW][RIVER_LEN]; 			        	/* map of river */
 char 	  status; 						  	    	/* game status = (g)ame, (d)ead, (q)uit */
 int       score = 0;                            	/* current score */
 int 	  hi = 0; 							    	/* highest score */
+int       speedrate = 50;							/* speed rate of log drift */
 pthread_t pth_kb, pth_dlog[ROW-2], pth_slog[ROW-2]; /* threads fetching kb and updating logs */
 pthread_mutex_t mutex;								/* mutex for log spawing threads */
 
@@ -54,7 +55,6 @@ public:
 
 	void draw() {
         printf("\33[s\u001b[32m\33[%d;%dH%s\u001b[0m\33[u", y+1, x+1, "@");
-		//printf(" (%d, %d)", x, y);
 		fflush(stdout);
 	}
 };
@@ -98,8 +98,8 @@ int rand_in(int l, int u) {
 
 /* clear screen. move cursor to topleft. */
 void scflush(const char* str = NULL) {
-	printf("\033[2J");
-	printf("\033[1;1H"); fflush(stdout);
+	printf("\033[2J\033[1;1H");
+	fflush(stdout);
 	if (str) printf("%s\n", str);
 }
 
@@ -120,13 +120,15 @@ void draw_map() {
 	printf("\33[%d;%dH%s%d", 1, COL+1, "BEST:", hi);
 	printf("\33[%d;%dH%s", 2, COL+1, "----------");
 	printf("\33[%d;%dH%s%d%s%d", 3, COL+1, "SCORE:", score, "/", ROW - 1);
+	printf("\33[%d;%dH%s", 5, COL+1, "SPEED (DON'T CHEAT!)");
+	printf("\33[%d;%dH%s%d%s", 6, COL+1, "[<]  ", speedrate, "%  [>]");
 	fflush(stdout);
 }
 
 void spawn_log_at_row(int y, int xoff = 0) {
 	/* drift right if y is even! */
 	bool drift_right = (y % 2 == 0);
-	int log_len = LOG_MAX_LEN + rand_in(-3, 0);
+	int log_len = LOG_MAX_LEN + rand_in(-LOG_LEN_VAR, 0);
 	if (drift_right)
 		memset(&at_map(-log_len + xoff, y), '=', log_len);
 	else
@@ -136,7 +138,8 @@ void spawn_log_at_row(int y, int xoff = 0) {
 void* rand_spawn_logs_at_row(void* y) {
 	while (status == 'g') {
 		spawn_log_at_row(*(int*)y);
-		usleep(LOG_SLEEP_US * (LOG_MAX_LEN + rand_in(5, 10)));
+		usleep(LOG_SLEEP_US * (1 - (speedrate - 50.0) / 100) * \
+		      (LOG_MAX_LEN + 5 + rand_in(0, LOG_MAX_INT)));
 	}
 }
 
@@ -149,7 +152,8 @@ void* drift_logs_at_row(void* py) {
 	t_off = rand_in(-t_off, t_off);
 
 	while (status == 'g') {
-		usleep(LOG_SLEEP_US + t_off);
+		usleep(LOG_SLEEP_US * (1 - (speedrate - 50.0) / 100) + t_off);
+		//printf("%d", speedrate);
 
 		/* even logs drift right */
 		if (y % 2 == 0) {
@@ -164,10 +168,11 @@ void* drift_logs_at_row(void* py) {
 		/* draw logs. Need a mutex to avoid printf conflict */
 		pthread_mutex_lock(&mutex);
 		printf("\033[%d;1H", y+1);
-		for (int x = 0; x < COL; x++) {
-			printf("%c", at_map(x, y));
-			fflush(stdout);
-		}
+		puts(&at_map(0, y));
+		// for (int x = 0; x < COL; x++) {
+		// 	printf("%c", at_map(x, y));
+		// 	fflush(stdout);
+		// }
 		pthread_mutex_unlock(&mutex);
 
 		/* frog on this row of log */
@@ -208,6 +213,14 @@ void* check_kb(void* _) {
 					frog.jump_to(
 						frog.x >= COL - 1? \
 						frog.x : frog.x + 1, frog.y); break;
+				case ',':
+					if (speedrate == 99) speedrate -= 9;
+					else if (speedrate > 10) speedrate -= 10;
+					break;
+				case '.':
+					if (speedrate < 90) speedrate += 10;
+					else if (speedrate == 90) speedrate += 9;
+					break;
 				case 'q': case 'Q':
 					status = 'q';
 					pthread_exit(NULL);
@@ -232,7 +245,8 @@ void* check_kb(void* _) {
 
 		printf("\33[s\33[%d;%dH%d\33[u", 1, COL+1+5, hi);
 		printf("\33[s\33[%d;%dH%d\33[u", 3, COL+1+6, score);
-	
+		printf("\33[s\33[%d;%dH%s%d%s\33[u", 6, COL+1, "[<]  ", speedrate, "%  [>]");
+
 	}
 }
 
@@ -254,26 +268,29 @@ void clean_stdin() {
 }
 
 void choose_difficulty() {
-	scflush("Choose difficulty...\n1) EZ\n2) meh\n3) CRAAAZY!");
+	scflush("Choose difficulty...\n[1] EZ\n[2] Meh\n[3] CRAAAZY!");
 	while (true) {
 		if (kbhit()) {
 			char difficulty = getchar();
 			switch (difficulty) {
 				case '1': 
 				LOG_LEN_VAR = 3;
-				LOG_MAX_LEN = 13;
-				LOG_MAX_INT = 2 * LOG_MAX_LEN;
+				LOG_MAX_LEN = 12;
+				LOG_MAX_INT = 4;
+				LOG_SLEEP_VAR = 0.5;
 				LOG_SLEEP_US = 3 * 1e5; return;
 				case '2': 
 				LOG_LEN_VAR = 4;
 				LOG_MAX_LEN = 10;
-				LOG_MAX_INT = 2.5 * LOG_MAX_LEN;
+				LOG_MAX_INT = 5;
+				LOG_SLEEP_VAR = 0.6;
 				LOG_SLEEP_US = 8 * 1e4; return;
 				case '3': 
 				LOG_LEN_VAR = 4;
 				LOG_MAX_LEN = 8;
-				LOG_MAX_INT = 3 * LOG_MAX_LEN;
-				LOG_SLEEP_US = 5 * 1e4; return;
+				LOG_MAX_INT = 5;
+				LOG_SLEEP_VAR = 0.6;
+				LOG_SLEEP_US = 4 * 1e4; return;
 				default: break;
 			}
 		}
@@ -297,6 +314,8 @@ int main(int argc, char *argv[]){
 	while (again) {
 
 		status = 'g';
+		score = 0;
+		speedrate = 50;
 		choose_difficulty();
 		init_map();
 		frog.jump_to(COL/2, ROW-1);
@@ -335,11 +354,11 @@ int main(int argc, char *argv[]){
 		/*  Display the output for user: win, lose or quit.  */
 		switch (status) {
 			case 'w': scflush("FROGGY WINS!!!"); hi = 0; break;
-			case 'd': scflush("FROGGY DIEEEEEED!"); break;
-			case 'q': scflush("FROGGY QUITS THE GAME!"); break;
+			case 'd': scflush("FROGGY DIEEEEEED!"); score = 0; break;
+			case 'q': scflush("FROGGY QUITS THE GAME!"); score = 0; break;
 		}
 
-		printf("Play again? (Y)es / (N)o");
+		printf("Play again? [Y]es / [N]o");
 		while (true) {
 			if (kbhit()) {
 				char c = getchar();
