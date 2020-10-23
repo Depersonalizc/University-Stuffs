@@ -13,54 +13,27 @@ const int COL = 50; 						    	/* width of screen */
 const int RIVER_SIDE_LEN = 15;						/* hidden side length of river */
 const int RIVER_LEN = COL + 2 * RIVER_SIDE_LEN; 	/* length of river */
 const int RIVER_AREA = RIVER_LEN * (ROW - 2);   	/* area of river */
-int 	  LOG_MAX_LEN = 8;				        	/* maximum log length */
+
+int 	  LOG_MAX_LEN = 8;				        	/* maximum log length, should be <= RIVER_SIDE_LEN */
 int       LOG_LEN_VAR = 3;							/* random variation of log length from max len*/
 float	  LOG_SLEEP_VAR = 0.5;						/* random variation of time interval of log drift from LOG_SLEEP_US */ 
 int       LOG_MAX_INT = 5;							/* maximum of random time interval of log drift */
 int 	  LOG_SLEEP_US = 1e5; 				    	/* time interval of log drift in us */
 char 	  map[ROW][RIVER_LEN]; 			        	/* map of river */
-char 	  status; 						  	    	/* game status = (g)ame, (d)ead, (q)uit */
+char 	  status; 						  	    	/* game status = (w)in, (d)ie, (q)uit */
 int       score = 0;                            	/* current score */
 int 	  hi = 0; 							    	/* highest score */
 int       speedrate = 50;							/* speed rate of log drift */
+
 pthread_t pth_kb, pth_dlog[ROW-2], pth_slog[ROW-2]; /* threads fetching kb and updating logs */
 pthread_mutex_t mutex;								/* mutex for log spawing threads */
 
-/* convert screen coord. (x, y) into map 
-   index and return a reference 
-*/
-char & at_map(int x, int y) {
-	return map[y][x + LOG_MAX_LEN];
-}
 
-class Frog{
-public:
-	/* coordinates on screen */
-	int x, y;
+// Utilities
 
-	/* constructor */
-	Frog(int _x = 0, int _y = 0) {
-		x = _x; y = _y;
-	}
-
-	/* setter of frog's position. Return true if on log or bank */
-	void jump_to(int _x, int _y) {
-		x = _x; y = _y;
-	}
-
-	bool alive() {
-		return (at_map(x, y) == '=' || at_map(x, y) == '|') \
-				&& x >= 0 && x < COL;
-	}
-
-	void draw() {printf("\33[s\u001b[32m\33[%d;%dH%s\u001b[0m\33[u", y+1, x+1, "@");}
-};
-
-Frog frog = Frog();
-
-/* Determine a keyboard is hit or not. 
-   If yes, return 1. Otherwise return 0. 
-*/
+/** Determine a keyboard is hit or not. 
+  * If yes, return 1. Otherwise return 0. 
+  */
 int kbhit(void){
 	struct termios oldt, newt;
 	int ch;
@@ -88,41 +61,78 @@ int kbhit(void){
 	return 0;
 }
 
+/** Convert screen coord. (x, y) into map 
+  * index and return a reference.
+  */
+char & at_map(int x, int y) {
+	return map[y][x + LOG_MAX_LEN];
+}
+
+/* Return a rand int from [l, u]. */
 int rand_in(int l, int u) {
 	return rand() % (u - l + 1) + l;
 }
 
-/* clear screen. move cursor to topleft. */
+/* Clear screen. Move cursor to topleft. */
 void scflush(const char* str = NULL) {
 	printf("\033[2J\033[1;1H");
 	fflush(stdout);
 	if (str) puts(str);
 }
 
-void draw_init_map() {
-
-	scflush();
-
-	/* draw bank/log/river */
-	for(int y = 0; y < ROW; y++) {
-		for (int x = 0; x < COL; x++)
-			printf("%c", at_map(x, y));
-		printf("\n");
-	}
-
-	frog.draw();
-
-	/* print hi-score and current score */
-	printf("\33[%d;%dH%s%d", 	 1, COL+1, "BEST:", hi);
-	printf("\33[%d;%dH%s",		 2, COL+1, "----------");
-	printf("\33[%d;%dH%s%d%s%d", 3, COL+1, "SCORE:", score, "/", ROW - 1);
-	printf("\33[%d;%dH%s", 		 5, COL+1, "SPEED (DON'T CHEAT!)");
-	printf("\33[%d;%dH%s%d%s", 	 6, COL+1, "\33[33m[<]\33[0m  ", speedrate, "%  \33[33m[>]\33[0m");
-	fflush(stdout);
+/** Flush stdin.
+  * © https://stackoverflow.com/questions/17318886/fflush-is-not-working-in-linux/23885008#23885008
+  */
+void clean_stdin() {
+	int stdin_cpy = dup(STDIN_FILENO);
+	tcdrain(stdin_cpy);
+	tcflush(stdin_cpy, TCIFLUSH);
+	close(stdin_cpy);
 }
 
-void spawn_log_at_row(int y, int xoff = 0) {
-	/* drift right if y is even! */
+/* Display n-sec count down */
+void countdown(int n) {
+	for (int i = n; i >= 1; i--) {
+		printf("\33[%d;%dH%d\n", ROW/2+1, COL/2+1, i);
+		usleep(1e6);
+	}   printf("\33[%d;%dH%s\n", ROW/2+1, COL/2, "GO!");
+		usleep(1e6);
+	/* clear input during count down */
+	clean_stdin();
+}
+
+
+// Frog object
+
+class Frog{
+public:
+	/* coordinates on screen */
+	int x, y;
+
+	/* constructor */
+	Frog(int _x = 0, int _y = 0) {
+		x = _x; y = _y;
+	}
+
+	/* setter of frog's position. Return true if on log or bank */
+	void jump_to(int _x, int _y) {
+		x = _x; y = _y;
+	}
+
+	bool alive() {
+		return (at_map(x, y) == '=' || at_map(x, y) == '|') \
+				&& x >= 0 && x < COL;
+	}
+
+	void draw() {printf("\33[s\u001b[32m\33[%d;%dH%s\u001b[0m\33[u", y+1, x+1, "@");}
+}; 
+Frog frog = Frog();
+
+
+// Threads
+
+/* spawn log on row y of random length with xoff offset w.r.t the boundary */
+void spawn_log_on_row(int y, int xoff = 0) {
 	bool drift_right = (y % 2 == 0);
 	int log_len = LOG_MAX_LEN + rand_in(-LOG_LEN_VAR, 0);
 	if (drift_right)
@@ -131,25 +141,28 @@ void spawn_log_at_row(int y, int xoff = 0) {
 		memset(&at_map(COL - xoff, y), '=', log_len);
 }
 
-void* rand_spawn_logs_at_row(void* y) {
-	while (status == 'g') {
-		spawn_log_at_row(*(int*)y);
+/** Thread function spawn_logs_on_row: For every random time interval, 
+  * spawn a log at row *y 
+  */
+void* spawn_logs_on_row(void* y) {
+	while (true) {
+		spawn_log_on_row(*(int*)y);
 		usleep(LOG_SLEEP_US * (1 - (speedrate - 50.0) / 100) * \
 		      (LOG_MAX_LEN + 5 + rand_in(0, LOG_MAX_INT)));
 	}
-	delete (int*) y;
-	pthread_exit(NULL);
+	// pthread_exit(NULL);    shall be exited by pthread_cancel()
 }
 
-/* In every slp ms, drift logs, check frog status, 
-   return if game ends */
-void* drift_logs_at_row(void* py) {
+/** Thread function drift_logs_on_row: For every random time interval, drift logs
+  * on row *py, move & redraw frog if it's on that row.
+  */
+void* drift_logs_on_row(void* py) {
 
 	int y = * (int*) py;
 	int t_off = LOG_SLEEP_VAR * LOG_SLEEP_US;
 	t_off = rand_in(-t_off, t_off);
 
-	while (status == 'g') {
+	while (true) {
 		usleep(LOG_SLEEP_US * (1 - (speedrate - 50.0) / 100) + t_off);
 
 		/* even logs drift right */
@@ -162,36 +175,34 @@ void* drift_logs_at_row(void* py) {
 			map[y][RIVER_LEN - 1] = ' ';
 		}
 
-		/* draw logs. Need a mutex to avoid printf conflict */
+		/* draw row. Need a mutex to avoid printf conflict */
 		pthread_mutex_lock(&mutex);
-		printf("\033[%d;1H", y+1);
+		printf("\033[%d;1H", y + 1);
 		for (int x = 0; x < COL; x++) {
 			printf("%c", at_map(x, y));
 		}
 		pthread_mutex_unlock(&mutex);
 
-		/* frog on this row of log */
-		/* move frog and check status */
+		/* frog on this row of log. Move/redraw frog. */
 		if (frog.y == y) {
 			frog.x += (y % 2 == 0)? 1 : -1;
 			frog.draw();
 		}
 	}
-	delete (int*) py;
-	pthread_exit(NULL);
+	// pthread_exit(NULL);    shall be exited by pthread_cancel()
 }
 
-/* check kb indefinitely, if kb caught, update frog position,
-   redraw map, and check frog status, return if game ends */
+/** Thread function check_kb: check kb indefinitely, if kb caught, update frog position,
+  * redraw map, and check frog status, return if game ends.
+  */
 void* check_kb(void* _) {
+	char dir;
 	while (true) {
-
-		/* kb activity caught! */
 		if (kbhit()) {
 			printf(
 				"\33[%d;%dH%s", frog.y+1, frog.x+1, 
 				(frog.y == ROW - 1)? "|" : "=");
-			char dir = getchar();
+			dir = getchar();
 			switch (dir) {
 				case 'w': case 'W':
 					frog.jump_to(
@@ -224,7 +235,8 @@ void* check_kb(void* _) {
 			/* frog could have moved. redraw. */
 			frog.draw();
 		}
-			
+		
+		/* update frog status, potentially exit*/
 		if (!frog.alive()) {
 			status = 'd';
 			pthread_exit(NULL);
@@ -235,9 +247,11 @@ void* check_kb(void* _) {
 			pthread_exit(NULL);
 		}
 
+		/* update scores */
 		score = ROW - 1 - frog.y;
 		if (score > hi) hi = score;
 
+		/* print scores and speed control */
 		printf("\33[s\33[%d;%dH%d\33[u", 	 1, COL+1+5, hi);
 		printf("\33[s\33[%d;%dH%d\33[u", 	 3, COL+1+6, score);
 		printf("\33[s\33[%d;%dH%s%d%s\33[u", 6, COL+1  ,
@@ -245,23 +259,10 @@ void* check_kb(void* _) {
 	}
 }
 
-void init_map() {
-	memset(map, 0, sizeof(map)) ;
-	memset(&at_map(0, 0), '|', COL);
-	memset(&at_map(0, ROW-1), '|', COL);
-	memset(&map[1], ' ', RIVER_AREA);
-}
 
-/** flush stdin.
-  * © https://stackoverflow.com/questions/17318886/fflush-is-not-working-in-linux/23885008#23885008
-  */
-void clean_stdin() {
-	int stdin_cpy = dup(STDIN_FILENO);
-	tcdrain(stdin_cpy);
-	tcflush(stdin_cpy, TCIFLUSH);
-	close(stdin_cpy);
-}
+// Game Configuration
 
+/* Ask the user to choose initial game difficulty. */
 void choose_difficulty() {
 	scflush("Choose difficulty...");
 	puts("\33[33m[1]\33[0m EZ");
@@ -296,7 +297,51 @@ void choose_difficulty() {
 	}
 }
 
+/* Initialize the map: fill river bank as '|' and river as ' '. */
+void init_map() {
+	memset(map, 0, sizeof(map)) ;
+	memset(&map, '|', RIVER_LEN);
+	memset(&map[ROW-1], '|', RIVER_LEN);
+	memset(&map[1], ' ', RIVER_AREA);
+}
+
+/* Draw the starting screen */
+void draw_init_screen() {
+	scflush();
+
+	/* draw bank/log/river */
+	for(int y = 0; y < ROW; y++) {
+		for (int x = 0; x < COL; x++)
+			printf("%c", at_map(x, y));
+		printf("\n");
+	}
+	frog.draw();
+
+	/* print hi-score and current score */
+	printf("\33[%d;%dH%s%d", 	 1, COL+1, "BEST:", hi);
+	printf("\33[%d;%dH%s",		 2, COL+1, "----------");
+	printf("\33[%d;%dH%s%d%s%d", 3, COL+1, "SCORE:", score, "/", ROW - 1);
+	printf("\33[%d;%dH%s", 		 5, COL+1, "SPEED (Don't cheat!)");
+	printf("\33[%d;%dH%s%d%s", 	 6, COL+1, "\33[33m[<]\33[0m  ", speedrate, "%  \33[33m[>]\33[0m");
+	printf("\33[%d;%dH%s", ROW/2+3, COL/2-20, "\33[90mPress \33[33m[W]\33[90m, \33[33m[A]\33[90m, \33[33m[S]\33[90m, \33[33m[D]\33[90m to control Froggy.");
+	printf("\33[%d;%dH%s", ROW/2+4, COL/2-20, "\33[90mPress \33[33m[Q]\33[90m to quit.\33[0m");
+	fflush(stdout);
+}
+
+/* Initialize the parameter of the game. */
+void init_game() {
+	score = 0;
+	speedrate = 50;
+	init_map();
+	frog.jump_to(COL/2, ROW-1);
+}
+
+/* Thread: main */
 int main(int argc, char *argv[]){
+	/* argument y's {1, 2, ..., ROW - 2} passed to threads */
+	int y[ROW - 2];
+	for (int i = 0; i < ROW - 2; i++)
+		y[i] = i + 1;
 
 	/* hide cursor and echo*/
 	printf("\033[?25l");
@@ -306,54 +351,43 @@ int main(int argc, char *argv[]){
     newt.c_lflag &= ~ECHO;
     tcsetattr(STDIN_FILENO, TCSANOW, &newt);
 
+	/* game body */
 	bool again = true;
 	while (again) {
-
-		status = 'g';
-		score = 0;
-		speedrate = 50;
+		init_game();
 		choose_difficulty();
-		init_map();
-		frog.jump_to(COL/2, ROW-1);
-		draw_init_map();
+		draw_init_screen();
+		countdown(3);
 
-		for (int i = 3; i >= 1; i--) {
-			printf("\33[%d;%dH%d\n", ROW/2+1, COL/2+1, i);
-			usleep(1e6);
-		}   printf("\33[%d;%dH%s\n", ROW/2+1, COL/2, "GO!");
-			usleep(1e6);
-
-		clean_stdin();
-
+		/* Threading begins */
 	    pthread_mutex_init(&mutex, NULL);
-
 	    pthread_create(&pth_kb, NULL, check_kb, NULL);
 	    for (int i = 0; i < ROW - 2; i++) {
-	    	int* y = new int;
-			int* py = new int;
-	    	*y = ROW - 2 - i;
-			*py = *y;
 	    	pthread_create(
 				&pth_slog[i], NULL, 
-				rand_spawn_logs_at_row, (void*) y);
+				spawn_logs_on_row, (void*) &y[i]);
 			pthread_create(
 				&pth_dlog[i], NULL,
-				drift_logs_at_row, (void*) py);
+				drift_logs_on_row, (void*) &y[i]);
 		}
-
+		/* wait for kb thread to end */
 	    pthread_join(pth_kb, NULL);
+
+		/* cancel all log threads directly */
 	    for (int i = 0; i < ROW - 2; i++) {
-			pthread_join(pth_dlog[i], NULL);
+			pthread_cancel(pth_slog[i]);
+			pthread_cancel(pth_dlog[i]);
 		}
     	pthread_mutex_destroy(&mutex);
-		
+
 		/*  Display the output for user: win, lose or quit.  */
 		switch (status) {
 			case 'w': scflush("   ˗ˏˋFROGGY WINS!ˎˊ˗   "); hi = 0; break;
-			case 'd': scflush("  FROGGY DIEEEEEED! :/  "); score = 0; break;
-			case 'q': scflush("FROGGY QUITS THE GAME :O"); score = 0; break;
+			case 'd': scflush("  FROGGY DIEEEEEED! :/  "); break;
+			case 'q': scflush("FROGGY QUITS THE GAME :O"); break;
 		}
-		
+
+		/* ask if wannna play again */
 		puts("------------------------");
 		puts("Play again? \33[33m[Y]\33[0mes / \33[33m[N]\33[0mo");
 		while (true) {
@@ -367,6 +401,7 @@ int main(int argc, char *argv[]){
 		}
 	}
 
+	/* user choosed to exit the game */
 	scflush();
 
 	/* restore cursor and echo */
