@@ -99,7 +99,7 @@ void scflush(const char* str = NULL) {
 	if (str) puts(str);
 }
 
-void draw_map() {
+void draw_init_map() {
 
 	scflush();
 
@@ -240,7 +240,8 @@ void* check_kb(void* _) {
 
 		printf("\33[s\33[%d;%dH%d\33[u", 	 1, COL+1+5, hi);
 		printf("\33[s\33[%d;%dH%d\33[u", 	 3, COL+1+6, score);
-		printf("\33[s\33[%d;%dH%s%d%s\33[u", 6, COL+1, "\33[33m[<]\33[0m  ", speedrate, "%  \33[33m[>]\33[0m");
+		printf("\33[s\33[%d;%dH%s%d%s\33[u", 6, COL+1  ,
+			   "\33[33m[<]\33[0m  ", speedrate, "%  \33[33m[>]\33[0m");
 	}
 }
 
@@ -262,7 +263,11 @@ void clean_stdin() {
 }
 
 void choose_difficulty() {
-	scflush("Choose difficulty...\n\33[33m[1]\33[0m EZ\n\33[33m[2]\33[0m Meh\n\33[33m[3]\33[0m CRAAAZY!");
+	scflush("Choose difficulty...");
+	puts("\33[33m[1]\33[0m EZ");
+	puts("\33[33m[2]\33[0m Meh");
+	puts("\33[33m[3]\33[0m CRAAAZY!");
+
 	while (true) {
 		if (kbhit()) {
 			char difficulty = getchar();
@@ -310,7 +315,7 @@ int main(int argc, char *argv[]){
 		choose_difficulty();
 		init_map();
 		frog.jump_to(COL/2, ROW-1);
-		draw_map();
+		draw_init_map();
 
 		for (int i = 3; i >= 1; i--) {
 			printf("\33[%d;%dH%d\n", ROW/2+1, COL/2+1, i);
