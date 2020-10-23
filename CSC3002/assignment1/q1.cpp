@@ -1,7 +1,7 @@
 /*
  * File: q1.cpp
  * ----------------------------------
- * This program is a simplified candelar.
+ * This program is a simplified calendar.
  * It outputs the number of days of each month in a given year.
  */
 

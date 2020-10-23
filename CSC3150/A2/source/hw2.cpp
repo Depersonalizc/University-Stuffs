@@ -44,7 +44,7 @@ public:
 	}
 
 	/* setter of frog's position. Return true if on log or bank */
-	bool jump_to(int _x, int _y) {
+	void jump_to(int _x, int _y) {
 		x = _x; y = _y;
 	}
 
@@ -53,10 +53,7 @@ public:
 				&& x >= 0 && x < COL;
 	}
 
-	void draw() {
-        printf("\33[s\u001b[32m\33[%d;%dH%s\u001b[0m\33[u", y+1, x+1, "@");
-		fflush(stdout);
-	}
+	void draw() {printf("\33[s\u001b[32m\33[%d;%dH%s\u001b[0m\33[u", y+1, x+1, "@");}
 };
 
 Frog frog = Frog();
@@ -84,8 +81,7 @@ int kbhit(void){
 	tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
 	fcntl(STDIN_FILENO, F_SETFL, oldf);
 
-	if(ch != EOF)
-	{
+	if(ch != EOF) {
 		ungetc(ch, stdin);
 		return 1;
 	}
@@ -100,7 +96,7 @@ int rand_in(int l, int u) {
 void scflush(const char* str = NULL) {
 	printf("\033[2J\033[1;1H");
 	fflush(stdout);
-	if (str) printf("%s\n", str);
+	if (str) puts(str);
 }
 
 void draw_map() {
@@ -117,11 +113,11 @@ void draw_map() {
 	frog.draw();
 
 	/* print hi-score and current score */
-	printf("\33[%d;%dH%s%d", 1, COL+1, "BEST:", hi);
-	printf("\33[%d;%dH%s", 2, COL+1, "----------");
+	printf("\33[%d;%dH%s%d", 	 1, COL+1, "BEST:", hi);
+	printf("\33[%d;%dH%s",		 2, COL+1, "----------");
 	printf("\33[%d;%dH%s%d%s%d", 3, COL+1, "SCORE:", score, "/", ROW - 1);
-	printf("\33[%d;%dH%s", 5, COL+1, "SPEED (DON'T CHEAT!)");
-	printf("\33[%d;%dH%s%d%s", 6, COL+1, "[<]  ", speedrate, "%  [>]");
+	printf("\33[%d;%dH%s", 		 5, COL+1, "SPEED (DON'T CHEAT!)");
+	printf("\33[%d;%dH%s%d%s", 	 6, COL+1, "\33[33m[<]\33[0m  ", speedrate, "%  \33[33m[>]\33[0m");
 	fflush(stdout);
 }
 
@@ -141,6 +137,8 @@ void* rand_spawn_logs_at_row(void* y) {
 		usleep(LOG_SLEEP_US * (1 - (speedrate - 50.0) / 100) * \
 		      (LOG_MAX_LEN + 5 + rand_in(0, LOG_MAX_INT)));
 	}
+	delete (int*) y;
+	pthread_exit(NULL);
 }
 
 /* In every slp ms, drift logs, check frog status, 
@@ -153,7 +151,6 @@ void* drift_logs_at_row(void* py) {
 
 	while (status == 'g') {
 		usleep(LOG_SLEEP_US * (1 - (speedrate - 50.0) / 100) + t_off);
-		//printf("%d", speedrate);
 
 		/* even logs drift right */
 		if (y % 2 == 0) {
@@ -168,11 +165,9 @@ void* drift_logs_at_row(void* py) {
 		/* draw logs. Need a mutex to avoid printf conflict */
 		pthread_mutex_lock(&mutex);
 		printf("\033[%d;1H", y+1);
-		puts(&at_map(0, y));
-		// for (int x = 0; x < COL; x++) {
-		// 	printf("%c", at_map(x, y));
-		// 	fflush(stdout);
-		// }
+		for (int x = 0; x < COL; x++) {
+			printf("%c", at_map(x, y));
+		}
 		pthread_mutex_unlock(&mutex);
 
 		/* frog on this row of log */
@@ -226,7 +221,7 @@ void* check_kb(void* _) {
 					pthread_exit(NULL);
 				default: break;
 			}
-			/* redraw frog */
+			/* frog could have moved. redraw. */
 			frog.draw();
 		}
 			
@@ -243,15 +238,14 @@ void* check_kb(void* _) {
 		score = ROW - 1 - frog.y;
 		if (score > hi) hi = score;
 
-		printf("\33[s\33[%d;%dH%d\33[u", 1, COL+1+5, hi);
-		printf("\33[s\33[%d;%dH%d\33[u", 3, COL+1+6, score);
-		printf("\33[s\33[%d;%dH%s%d%s\33[u", 6, COL+1, "[<]  ", speedrate, "%  [>]");
-
+		printf("\33[s\33[%d;%dH%d\33[u", 	 1, COL+1+5, hi);
+		printf("\33[s\33[%d;%dH%d\33[u", 	 3, COL+1+6, score);
+		printf("\33[s\33[%d;%dH%s%d%s\33[u", 6, COL+1, "\33[33m[<]\33[0m  ", speedrate, "%  \33[33m[>]\33[0m");
 	}
 }
 
 void init_map() {
-	memset( map, 0, sizeof( map ) ) ;
+	memset(map, 0, sizeof(map)) ;
 	memset(&at_map(0, 0), '|', COL);
 	memset(&at_map(0, ROW-1), '|', COL);
 	memset(&map[1], ' ', RIVER_AREA);
@@ -268,7 +262,7 @@ void clean_stdin() {
 }
 
 void choose_difficulty() {
-	scflush("Choose difficulty...\n[1] EZ\n[2] Meh\n[3] CRAAAZY!");
+	scflush("Choose difficulty...\n\33[33m[1]\33[0m EZ\n\33[33m[2]\33[0m Meh\n\33[33m[3]\33[0m CRAAAZY!");
 	while (true) {
 		if (kbhit()) {
 			char difficulty = getchar();
@@ -306,9 +300,6 @@ int main(int argc, char *argv[]){
     termios newt = oldt;
     newt.c_lflag &= ~ECHO;
     tcsetattr(STDIN_FILENO, TCSANOW, &newt);
-
-	// pthread_mutex_t mutex;
-	// pthread_cond_t cond;
 
 	bool again = true;
 	while (again) {
@@ -353,12 +344,13 @@ int main(int argc, char *argv[]){
 		
 		/*  Display the output for user: win, lose or quit.  */
 		switch (status) {
-			case 'w': scflush("FROGGY WINS!!!"); hi = 0; break;
-			case 'd': scflush("FROGGY DIEEEEEED!"); score = 0; break;
-			case 'q': scflush("FROGGY QUITS THE GAME!"); score = 0; break;
+			case 'w': scflush("   ˗ˏˋFROGGY WINS!ˎˊ˗   "); hi = 0; break;
+			case 'd': scflush("  FROGGY DIEEEEEED! :/  "); score = 0; break;
+			case 'q': scflush("FROGGY QUITS THE GAME :O"); score = 0; break;
 		}
-
-		printf("Play again? [Y]es / [N]o");
+		
+		puts("------------------------");
+		puts("Play again? \33[33m[Y]\33[0mes / \33[33m[N]\33[0mo");
 		while (true) {
 			if (kbhit()) {
 				char c = getchar();
