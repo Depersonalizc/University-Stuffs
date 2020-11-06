@@ -102,18 +102,19 @@ int load_binaryFile(const char *fileName, void *buffer, int bufferSize) {
 int main() {
 	/* number of bytes loaded from binary file to input buffer */
 	int input_size = load_binaryFile(DATAFILE, input, DISK_SIZE);
-	for (int i = 0; i < 100000; i++) {
-		printf("%u, ", input[i]);
-	}
+	
+	// for (int i = 0; i < 100000; i++) {
+	// 	printf("%u, ", input[i]);
+	// }
 
-	// mykernel(input_size);
+	mykernel(input_size);
 
-	// printf("input size: %d\n", input_size);
+	printf("input size: %d\n", input_size);
 
 	// /* write result buffer to OUTFILE */
-	// write_binaryFile(OUTFILE, result, input_size);
+	write_binaryFile(OUTFILE, result, input_size);
 
-	// printf("pagefault number is %d\n", n_page_fault);
+	printf("pagefault number is %d\n", n_page_fault);
 
 	// load_binaryFile(OUTFILE, input, DISK_SIZE);
 	// for (int i = 0; i < 100000; i++) {

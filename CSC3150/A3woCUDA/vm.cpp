@@ -1,10 +1,10 @@
-#include "vm.h"
+﻿#include "vm.h"
 
 void init_inv_page_table(VirtualMemory *vm) {
 	vm->inv_page_table->head = nullptr;
 	vm->inv_page_table->tail = nullptr;
 	for (int i = 0; i < N_PHYSICAL_PAGES; i++)
-		vm->inv_page_table->map[i] = nullptr;
+		vm->inv_page_table->map[i].vp_num = -1;
 }
 
 void vm_init(VirtualMemory* vm, uchar* data, uchar* disk,
@@ -21,7 +21,7 @@ void vm_init(VirtualMemory* vm, uchar* data, uchar* disk,
 /* return physical page number if virtual page found, return -1 otherwise */
 short table_translate_vp_to_pp(InvPageTable* table, short vp_num) {
 	for (int i = 0; i < N_PHYSICAL_PAGES; i++) {
-		if (table->map[i] != nullptr && table->map[i]->vp_num == vp_num)
+		if (table->map[i].vp_num == vp_num)
 			return i;
 	} return -1;
 }
@@ -29,7 +29,7 @@ short table_translate_vp_to_pp(InvPageTable* table, short vp_num) {
 /* return first empty pp, return -1 otherwise. */
 short table_find_empty_pp(InvPageTable* table) {
 	for (int i = 0; i < N_PHYSICAL_PAGES; i++) {
-		if (!table->map[i])
+		if (table->map[i].vp_num == -1)
 			return i;
 	} return -1;
 }
@@ -46,30 +46,32 @@ short table_pop(InvPageTable* table) {
 		table->tail->next = table->head;
 		table->head->prev = table->tail;
 	}
-	table->map[pp_num] = nullptr;
-	free(tail_node);
+	table->map[pp_num].vp_num = -1;
 	return pp_num;
 }
 
 /* push Node to head of the list, map pp_num to vp_num */
 void table_push(InvPageTable* table, short pp_num, short vp_num) {
-	Node* new_node = (Node*) malloc(sizeof(Node));
-	new_node->vp_num = vp_num;
+	// Node* new_node = (Node*) malloc(sizeof(Node));
+	// new_node->vp_num = vp_num;
+
+	Node* node = &table->map[pp_num];
+	node->vp_num = vp_num;
 
 	if (table->head == nullptr) {
-		table->head = new_node;
-		table->tail = new_node;
-		new_node->next = new_node;
-		new_node->prev = new_node;
+		table->head = node;
+		table->tail = node;
+		node->next  = node;
+		node->prev  = node;
 	} else {
-		new_node->prev = table->tail;
-		new_node->next = table->head;
-		table->tail->next = new_node;
-		table->head->prev = new_node;
-		table->head = new_node;
+		node->prev = table->tail;
+		node->next = table->head;
+		table->tail->next = node;
+		table->head->prev = node;
+		table->head = node;
 	}
 
-	table->map[pp_num] = new_node;
+	// table->map[pp_num] = new_node;
 
 	// printf("map[%d] := %d\n", pp_num, table->map[pp_num]);
 }
@@ -77,8 +79,8 @@ void table_push(InvPageTable* table, short pp_num, short vp_num) {
 void table_print_map(InvPageTable* table, int first_n){
 	for (int i = 0; i < first_n; i++){
 		printf("PP 0x%03x -> VP ", i);
-		if (table->map[i])
-			printf("0x%03x\n", table->map[i]->vp_num);
+		if (table->map[i].vp_num != -1)
+			printf("0x%03x\n", table->map[i].vp_num);
 		else
 			printf("0x---\n");
 	}
@@ -141,7 +143,7 @@ uchar vm_read(VirtualMemory *vm, u32 va) {
 	} else {
 		/* In RAM. Pop out Node to head. */
 		// printf("[vm_read]: Page in RAM. Updating VP=0x%03x as MRU.\n", table->map[pp]->vp_num);
-		if ((node = table->map[pp]) != table->head) {
+		if ((node = &table->map[pp]) != table->head) {
 			if (node == table->tail) table->tail = node->prev;
 			node->prev->next = node->next;
 			node->next->prev = node->prev;
@@ -194,7 +196,7 @@ void vm_write(VirtualMemory *vm, u32 va, uchar value) {
 	} else {
 		/* In RAM. Update page as MRU. */
 		// printf("[vm_write]: Page in RAM. Updating VP=0x%03x as MRU.\n", table->map[pp]->vp_num);
-		if ((node = table->map[pp]) != table->head) {
+		if ((node = &table->map[pp]) != table->head) {
 			if (node == table->tail) table->tail = node->prev;
 			node->prev->next = node->next;
 			node->next->prev = node->prev;

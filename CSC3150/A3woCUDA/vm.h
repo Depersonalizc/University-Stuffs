@@ -1,4 +1,4 @@
-#ifndef VM_H
+﻿#ifndef VM_H
 #define VM_H
 
 #include <inttypes.h>
@@ -27,7 +27,7 @@ struct Node {
 };
 
 struct InvPageTable {
-	Node* map[N_PHYSICAL_PAGES];		/* Mapping from PP num to Node with VP num */
+	Node  map[N_PHYSICAL_PAGES];		/* Mapping from PP num to Node with VP num */
 	Node* head;							/* ptr to recently used Node	   */
 	Node* tail;							/* ptr to least recently used Node	   */
 };
