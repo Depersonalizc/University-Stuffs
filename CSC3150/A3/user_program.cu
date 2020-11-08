@@ -1,9 +1,9 @@
-#include "virtual_memory.h"
+﻿#include "vm.h"
 #include <cuda.h>
 #include <cuda_runtime.h>
 
-__device__ void user_program(VirtualMemory *vm, uchar *input, 
-							 uchar *result, int input_size) {
+__device__ void user_program(VirtualMemory *vm, uchar *input,
+				  uchar *result, int input_size) {
 	for (int i = 0; i < input_size; i++)
 		vm_write(vm, i, input[i]);
 

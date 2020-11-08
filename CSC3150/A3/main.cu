@@ -1,4 +1,4 @@
-#include "virtual_memory.h"
+﻿#include "vm.h"
 #include <cuda.h>
 #include <cuda_runtime.h>
 #include <device_launch_parameters.h>
@@ -9,53 +9,46 @@
 #define DATAFILE "./data.bin"
 #define OUTFILE "./snapshot.bin"
 
-#define PAGE_SIZE 		  (1 << 5)   /* PAGE SIZE = 32 bytes */
-#define PAGE_TABLE_SIZE	  (1 << 14)  /* PAGE TABLE (on shared mem.) = 16 KB */
-#define PHYSICAL_MEM_SIZE (1 << 15)  /* PHYSICAL MEMORY (on shared mem.) = 32 KB */
-#define DISK_SIZE 		  (1 << 17)  /* DISK (GLOBAL MEMORY) = 128 KB */
+__managed__ int   n_page_fault = 0;
+__managed__ uchar result[DISK_SIZE];
+__managed__ uchar input[DISK_SIZE];
+__managed__ uchar disk[DISK_SIZE];
 
-// count the pagefault times
-__device__ __managed__ int n_page_fault = 0;
+__device__ void user_program(VirtualMemory* vm, uchar *input,
+							 uchar *result, int input_size) {
 
-// data input and output
-__device__ __managed__ uchar result[DISK_SIZE];
-__device__ __managed__ uchar input[DISK_SIZE];
+	for (int i = 0; i < input_size; i++)
+		vm_write(vm, i, input[i]);
 
-// memory allocation for virtual_memory
-__device__ __managed__ uchar disk[DISK_SIZE];
-extern __shared__ u32 page_table[];
+	for (int i = input_size - 1; i >= input_size - 32769; i--)
+		int value = vm_read(vm, i);
 
-__device__ void user_program(VirtualMemory *vm, uchar *input, uchar *result,
-                             int input_size);
+	vm_snapshot(vm, result, 0, input_size);
 
-__global__ void mykernel(int input_size) {
-
-	// physical memory
-	__shared__ uchar data[PHYSICAL_MEM_SIZE];
-
-	VirtualMemory vm;
-	/* 
-	vm_init(VirtualMemory *vm, uchar *buffer, uchar *disk,
-			u32 *page_table, int *pagefault_num_ptr,
-			int PAGESIZE, int PAGE_TABLE_SIZE,
-			int PHYSICAL_MEM_SIZE, int DISK_SIZE,
-			int PAGE_ENTRIES); */
-	vm_init(&vm, data, disk, page_table, &n_page_fault,
-			PAGE_SIZE, PAGE_TABLE_SIZE, PHYSICAL_MEM_SIZE, 
-			DISK_SIZE, PHYSICAL_MEM_SIZE / PAGE_SIZE);
-
-	// user program for testing paging
-	user_program(&vm, input, result, input_size);
 }
 
-__host__ void write_binaryFile(char *fileName, void *buffer, int bufferSize) {
+__global__ void my_kernel(int input_size) {
+
+	/* Physical memory */
+	__shared__ uchar data[PHYSICAL_MEM_SIZE];
+	__shared__ short   pt[N_PHYSICAL_PAGES];
+	__shared__ u32  count[N_PHYSICAL_PAGES + 1];
+
+	VirtualMemory vm;
+	vm_init(&vm, data, disk, pt, count, &n_page_fault);
+
+	user_program(&vm, input, result, input_size);
+	vm_print_map(&vm);
+}
+
+void write_binaryFile(const char *fileName, void *buffer, int bufferSize) {
 	FILE *fp;
 	fp = fopen(fileName, "wb");
 	fwrite(buffer, 1, bufferSize, fp);
 	fclose(fp);
 }
 
-__host__ int load_binaryFile(char *fileName, void *buffer, int bufferSize) {
+int load_binaryFile(const char *fileName, void *buffer, int bufferSize) {
 	FILE *fp;
 
 	fp = fopen(fileName, "rb");
@@ -83,31 +76,39 @@ __host__ int load_binaryFile(char *fileName, void *buffer, int bufferSize) {
 	return fileLen;
 }
 
+
 int main() {
 	cudaError_t cudaStatus;
-	/* number of bytes loaded from binary file to input buffer*/
+
+	/* number of bytes loaded from binary file to input buffer
+	 * 131072 bytes == 128 KB == 4 * RAM */
 	int input_size = load_binaryFile(DATAFILE, input, DISK_SIZE);
 
-	/* Launch kernel function in GPU, with single thread
-	and dynamically allocate PAGE_TABLE_SIZE bytes of share memory,
-	which is used for variables declared as "extern __shared__" */
-	mykernel<<<1, 1, PAGE_TABLE_SIZE>>>(input_size);
+	printf("[main] : Starting my_kernel...\n");
+	my_kernel<<<1, 1>>>(input_size);
 
 	if ((cudaStatus = cudaGetLastError()) != cudaSuccess) {
-		fprintf(stderr, "mykernel launch failed: %s\n",
+		fprintf(stderr, "[main] : my_kernel launch failed: %s\n",
 				cudaGetErrorString(cudaStatus));
 		return 0;
 	}
 
-	printf("input size: %d\n", input_size);
-
 	cudaDeviceSynchronize();
+
+	if ((cudaStatus = cudaGetLastError()) != cudaSuccess) {
+		fprintf(stderr, "[main] : my_kernel sync failed: %s\n",
+				cudaGetErrorString(cudaStatus));
+		return 0;
+	}
+
 	cudaDeviceReset();
 
-	/* write result buffer to OUTFILE */
+	printf("[main] : my_kernel has ended.\n");
+
 	write_binaryFile(OUTFILE, result, input_size);
 
-	printf("pagefault number is %d\n", n_page_fault);
+	printf("[main] : Input size: %d\n", input_size);
+	printf("[main] : Page Fault number is %d.\n", n_page_fault);
 
 	return 0;
 }
